@@ -1,14 +1,15 @@
 import React from 'react';
-import { FaBars } from 'react-icons/fa';
 import { NavLink as Link } from 'react-router-dom';
-import './header.css';
+import {
+  Bars, Nav, NavLink, NavMenu
+} from './header_elements';
+import './header_elements.css';
 import logo from './logo.png';
-
+  
 const Header = () => {
   return (
-    <>
-      <nav className='navv'>
-        <FaBars className='bars' />
+    <> 
+      <Nav>
         <div
           className='navv-logo'
           style={{
@@ -26,21 +27,19 @@ const Header = () => {
             />
           </Link>
         </div>
-        <div
-          style={{
-            marginLeft: '20px',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          <Link to='/' className='navv-link'>
-            <p style={{fontSize: '20px', color: 'black', fontFamily: 'Abel'}}>SMARTIVE</p>
-          </Link>
-          </div>
-      </nav>
+        <Link to='/' className='navv-link'><h2 style={{marginLeft: '18px', marginRight: '60px', fontSize: '23px'}}>SMARTIVE</h2></Link>
+        <Bars />
+        <NavMenu>
+          <NavLink to='/' activeStyle>
+            Home
+          </NavLink>
+          <NavLink to='/about' activeStyle>
+            About Us
+          </NavLink>
+        </NavMenu>
+      </Nav>
     </>
   );
 };
-
+  
 export default Header;

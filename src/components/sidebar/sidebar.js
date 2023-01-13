@@ -1,36 +1,27 @@
 import React from 'react';
-import { NavLink as Link } from 'react-router-dom';
-import './sidebar.css';
+import { Menu, Sidebar } from 'react-pro-sidebar';
+import SidebarMenuItem from './sidebar_menu_item';
 
-const SideBar = () => {
+const SourceCodeView = () => {
     return (
-        <div className='general-sidebar-container'>
-        <div className='home-page-con'>
-        <h2>Contract Templates</h2>
-          <Link style={{color: 'black'}} to='/' className='navv-link'>Stadium Ticket</Link>
-          <br></br>
-          <Link style={{color: 'black'}} to='/' className='navv-link'>Cafe Menu</Link>
-          <br></br>
-          <Link style={{color: 'black'}} to='/' className='navv-link'>Clinical Trial Data</Link>
-          <br></br>
-          <Link style={{color: 'black'}} to='/' className='navv-link'>Clothing</Link>
-          <br></br>
-          <Link style={{color: 'black'}} to='/' className='navv-link'>Numbered Event Ticket</Link>
-          <br></br>
-          <Link style={{color: 'black'}} to='/' className='navv-link'>Product Management</Link>
-          <br></br>
-          <Link style={{color: 'black'}} to='/' className='navv-link'>Weighted Multiple Voting</Link>
-          <br></br>
-          <Link style={{color: 'black'}} to='/' className='navv-link'>Game Objects</Link>
-          <br></br>
-          <Link style={{color: 'black'}} to='/' className='navv-link'>Insurance</Link>
-          <br></br>
-          <Link style={{color: 'black'}} to='/' className='navv-link'>Time Slot</Link>
-          <br></br>
-          <Link style={{color: 'black'}} to='/' className='navv-link'>UnNumbered Event Ticket</Link>
-        </div>
-    </div>
+      <Sidebar>
+      <h3 style={{textAlign: 'center', marginBottom:'3%', marginTop:'5%', fontSize: '24px' }}>Contract Templates</h3>
+      <Menu>
+        <SidebarMenuItem toUrl="stadium-ticket" label="Stadium Ticket" />
+        <SidebarMenuItem toUrl="cafe-menu" label="Cafe Menu" />
+        <SidebarMenuItem toUrl="clinical-trial-data" label="Clinical Trial Data" />
+        <SidebarMenuItem toUrl="numbered-event-ticket" label="Numbered Event Ticket" />
+        <SidebarMenuItem toUrl="clothing" label="Clothing" />
+        <SidebarMenuItem toUrl="game-objects" label="Game Objects" />
+        <SidebarMenuItem toUrl="insurance" label="Insurance" />
+        <SidebarMenuItem toUrl="product-management" label="Product Management" />
+        <SidebarMenuItem toUrl="time-slot" label="Time Slot" />
+        <SidebarMenuItem toUrl="travel-ticket" label="Travel Ticket" />
+        <SidebarMenuItem toUrl="unnumbered-event-ticket" label="UnNumbered Event Ticket" />
+        <SidebarMenuItem toUrl="weighted-multiple-voting" label="Weighted Multiple Voting" />
+      </Menu>
+    </Sidebar>
     );
-
 };
-export default SideBar;
+
+export default SourceCodeView;

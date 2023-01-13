@@ -1,0 +1,9 @@
+.source-code-container {
+  position: 'fixed';
+  bottom: '280px';
+  right: '0px';
+  z-index: '214783647';
+  width: '320px';
+  height: '40px';
+  max-height: '400px';
+}
