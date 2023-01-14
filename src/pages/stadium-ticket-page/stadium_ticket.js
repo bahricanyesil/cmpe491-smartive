@@ -139,7 +139,7 @@ const StadiumTicket = () => {
           const commaIndex = directions.lastIndexOf(",");
           const openIndex = directions.lastIndexOf("{");
           const lastDirection = directions.slice((commaIndex === -1 ? openIndex-1 : commaIndex) + 2, directions.lastIndexOf("}"));
-          newLines.push(`        require(direction <= uint8(BlockDirection.${lastDirection}), \"Direction is out of range.\");`);
+          newLines.push(`        require(direction <= uint8(BlockDirection.${lastDirection}), "Direction is out of range.");`);
         }
       } else if (i===6) {
         newLines.push(hasDirection ? hasDirectionAssign : withoutDirectionAssign);
