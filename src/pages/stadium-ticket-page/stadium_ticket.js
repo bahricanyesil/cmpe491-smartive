@@ -154,7 +154,7 @@ const StadiumTicket = () => {
     } 
     setContractCode(newLines.join('\n'));
   };
-
+  
   return (
     <div style={{ display: 'flex', height: '100%', direction: 'ltr' }}>
        <div style={{ padding: '16px 24px', color: '#44596e' }}>

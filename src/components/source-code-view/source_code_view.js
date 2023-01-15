@@ -26,11 +26,6 @@ const SourceCodeView = ({contractName, contractCode}) => {
   const [open, setOpen] = useState(false);
 
   function handleCompile() {
-    // const compiled = solc.compile(contractCode);
-    // const contractName = Object.keys(compiled.contracts)[0];
-    // const abi = JSON.parse(compiled.contracts[contractName].interface);
-    // const bytecode = compiled.contracts[contractName].bytecode;
-    // setCompiledData({ abi, bytecode });
   }
 
   const deployContract = async () => {
@@ -67,7 +62,10 @@ const SourceCodeView = ({contractName, contractCode}) => {
       <h3>{contractName}</h3>
       <div>
       <Button startIcon={<ContentCopyIcon />} onClick={copyAction} variant="contained">Copy</Button>
-      <Button startIcon={<ConstructionIcon />} style={{marginLeft: '20px'}} sx={{ backgroundColor: green[700] }} onClick={handleCompile} variant="contained">Compile</Button>
+      <Button startIcon={<ConstructionIcon />} style={{marginLeft: '20px'}} sx={{ backgroundColor: green[700] }} 
+      // component={Link} to="/compile-contract" 
+      //   state={{ contractCode }} 
+        variant="contained">Compile</Button>
       <Button startIcon={<CloudUploadIcon />} style={{marginLeft: '20px'}} sx={{ backgroundColor: pink[700] }} onClick={deployContract} variant="contained">Deploy</Button>
       </div>
     </div>
