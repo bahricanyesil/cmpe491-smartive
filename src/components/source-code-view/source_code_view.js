@@ -7,13 +7,8 @@ import { green, pink } from '@mui/material/colors';
 import Snackbar from '@mui/material/Snackbar';
 import CodeEditor from '@uiw/react-textarea-code-editor';
 import React, { useState } from 'react';
-import TruffleContract from 'truffle-contract';
 import Web3 from 'web3';
 import './source_code_view.css';
-
-const contract = TruffleContract();
-
-const bytecode = contract.bytecode
 
 const Alert = React.forwardRef(function Alert(
   props,
