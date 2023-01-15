@@ -1,5 +1,6 @@
+import React, { useEffect, useState } from 'react';
+import Web3 from 'web3';
 
-import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import Header from './components/header/header';
 import AboutPage from './pages/about/about';
