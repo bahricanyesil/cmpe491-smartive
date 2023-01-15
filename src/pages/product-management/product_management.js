@@ -18,7 +18,7 @@ const ProductManagement = () => {
     <div style={{ display: 'flex', height: '100%', direction: 'ltr' }}>
       <main>
         <div style={{ padding: '16px 24px', color: '#44596e' }}>
-       {contractCode ? <SourceCodeView contractName={"Product Management Contract Code Editor"} contractCode={contractCode}/> : <p>Loading...</p>}
+       {contractCode ? <SourceCodeView key={contractCode} contractName={"Product Management Contract Code Editor"} contractCode={contractCode}/> : <p>Loading...</p>}
         </div>
       </main>
       </div>

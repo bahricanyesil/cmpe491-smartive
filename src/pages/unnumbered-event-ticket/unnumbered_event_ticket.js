@@ -18,7 +18,7 @@ const UnNumberedEventTicket = () => {
     <div style={{ display: 'flex', height: '100%', direction: 'ltr' }}>
       <main>
         <div style={{ padding: '16px 24px', color: '#44596e' }}>
-       {contractCode ? <SourceCodeView contractName={"UnNumbered Event Ticket Contract Code Editor"} contractCode={contractCode}/> : <p>Loading...</p>}
+       {contractCode ? <SourceCodeView key={contractCode} contractName={"UnNumbered Event Ticket Contract Code Editor"} contractCode={contractCode}/> : <p>Loading...</p>}
         </div>
       </main>
       </div>

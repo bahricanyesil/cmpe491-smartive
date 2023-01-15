@@ -42,7 +42,6 @@ const StadiumTicket = () => {
       });
   }, []);
 
-
   const checkN = (event) => {
     const newCheckedDirectionList = [event.target.checked, checkedDirections[1], checkedDirections[2], checkedDirections[3]];
     setCheckedDirections(newCheckedDirectionList);

@@ -18,7 +18,7 @@ const ClinicalTrialData = () => {
     <div style={{ display: 'flex', height: '100%', direction: 'ltr' }}>
       <main>
         <div style={{ padding: '16px 24px', color: '#44596e' }}>
-       {contractCode ? <SourceCodeView contractName={"Clinical Trial Data Contract Code Editor"} contractCode={contractCode}/> : <p>Loading...</p>}
+       {contractCode ? <SourceCodeView key={contractCode} contractName={"Clinical Trial Data Contract Code Editor"} contractCode={contractCode}/> : <p>Loading...</p>}
         </div>
       </main>
       </div>
