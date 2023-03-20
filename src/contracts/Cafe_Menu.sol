@@ -15,12 +15,12 @@ contract CafeMenu is ERC1155, Ownable {
     struct MenuItem {
         uint256 tokenId;
         uint256 price;
-        string name;
+        uint256 soldNumber;
         MenuItemType itemType;
+        string name;
         uint256 calories;
         uint256 preparationTime;
         string[] ingredients;
-        uint256 soldNumber;
     }
 
     struct Order {
@@ -39,8 +39,7 @@ contract CafeMenu is ERC1155, Ownable {
         lastUpdate = block.timestamp;
     }
 
-    function addNewMenuItem(uint256 price, string memory name, uint8 itemType, uint256 calories, uint256 preparationTime,
-        string[] memory ingredients, uint256 initialAmount) public onlyOwner {
+    function addNewMenuItem(uint256 price, string memory name, uint8 itemType, uint256 calories, uint256 preparationTime, string[] memory ingredients, uint256 initialAmount) public onlyOwner {
         require(itemType <= uint8(MenuItemType.FRUIT), "Menu item type is out of range.");
         require(price >= 0, "Price should be greater than or equal to 0.");
         require(calories > 0, "Calories should be greater than 0.");
@@ -51,7 +50,7 @@ contract CafeMenu is ERC1155, Ownable {
         }
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
-        menuItems[tokenId] = MenuItem(tokenId, price, name, MenuItemType(itemType), calories, preparationTime, ingredients, 0);
+        menuItems[tokenId] = MenuItem(tokenId, price, 0, MenuItemType(itemType), name, calories, preparationTime, ingredients);
         supplies.push(initialAmount);
         _mint(owner(), tokenId, initialAmount, "");
     }

@@ -64,11 +64,11 @@ const StadiumTicket = () => {
   const addMatchDetail = (e) => {
     if(e.key != 'Enter') return;
     const val = matchDetailType;
-    if(val !== 'string' && val !== 'uint256' && val !== 'bool' && val !== 'address' && val !== 'bytes' && val != 'uint128' && val != 'uint64' && val != 'uint32' && val != 'uint16') {
+    if(val !== 'string' && val !== 'string[]' && val !== 'uint256' && val !== 'bool' && val !== 'address' && val !== 'bytes' && val != 'uint128' && val != 'uint64' && val != 'uint32' && val != 'uint16') {
       alert('Please enter a valid type');
       return;
     }
-    if(matchDetailName == 'string' || matchDetailName == 'uint256' || matchDetailName == 'bool' || matchDetailName == 'address' || matchDetailName == 'bytes' || matchDetailName == 'uint128' || matchDetailName == 'uint64' || matchDetailName == 'uint32' || matchDetailName == 'uint16') {
+    if(matchDetailName == 'string' || matchDetailName == 'string[]' || matchDetailName == 'uint256' || matchDetailName == 'bool' || matchDetailName == 'address' || matchDetailName == 'bytes' || matchDetailName == 'uint128' || matchDetailName == 'uint64' || matchDetailName == 'uint32' || matchDetailName == 'uint16') {
       alert('Please enter a valid name');
       return;
     }
@@ -245,7 +245,7 @@ const StadiumTicket = () => {
       if(!newCheckedList[i]) continue;
       entered = true;
       matchStruct.push(`        ${newMatchDetailTypes[i]} ${newMatchList[i]};`);
-      if(newMatchDetailTypes[i] == 'string'){
+      if(newMatchDetailTypes[i].includes('string')){
         startString += newMatchDetailTypes[i] + ' memory ' + newMatchList[i] + '_, ';
       } else {
         startString += newMatchDetailTypes[i] + ' ' + newMatchList[i] + '_, ';
