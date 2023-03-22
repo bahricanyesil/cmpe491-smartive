@@ -9,9 +9,8 @@ import logo from './logo.png';
 const Header = () => {
   return (
     <> 
-      <Nav>
+      <Nav style={{alignItems: 'center', flexDirection: 'row', paddingLeft: '30px'}}>
         <div
-          className='navv-logo'
           style={{
             display: 'flex',
             alignItems: 'center',
@@ -27,7 +26,7 @@ const Header = () => {
             />
           </Link>
         </div>
-        <Link to='/' className='navv-link'><h2 style={{marginLeft: '18px', marginRight: '60px', fontSize: '23px'}}>SMARTIVE</h2></Link>
+        <Link to='/' className='navv-link'><h2 style={{marginLeft: '18px', marginRight: '60px', fontSize: '23px', paddingTop:'0px', paddingBottom:'0px', marginTop:'0px',marginBottom:'0px'}}>SMARTIVE</h2></Link>
         <Bars />
         <NavMenu>
           <NavLink to='/' activeStyle>

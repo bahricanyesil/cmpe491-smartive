@@ -16,8 +16,8 @@ contract UnNumberedTicket is ERC1155, Pausable, Ownable {
         uint256 categoryId;
         uint256 price;
         uint256 capacity;
-        string name;
         uint256 minted;
+        string name;
     }
 
     struct EventDetails {
@@ -62,7 +62,7 @@ contract UnNumberedTicket is ERC1155, Pausable, Ownable {
         }
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
-        categories[tokenId] = EventCategory(tokenId, price, capacity, name, 0);
+        categories[tokenId] = EventCategory(tokenId, price, capacity, 0, name);
         supplies.push(capacity);
         _mint(msg.sender, tokenId, capacity, "");
         categoryList.push(tokenId);
