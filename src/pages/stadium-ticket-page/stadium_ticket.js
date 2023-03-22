@@ -279,7 +279,7 @@ const StadiumTicket = () => {
   
   return (
     <div style={{ display: 'flex', height: '100%', direction: 'ltr' }}>
-       <div style={{ padding: '16px 24px', color: '#44596e' }}>
+       <div style={{ padding: '16px 24px', width: '77%', color: '#44596e' }}>
        {contractCode ? <SourceCodeView key={contractCode} contractName={"Stadium Ticket Contract Code Editor"} contractCode={contractCode}/> : <p>Loading...</p>}
         </div>
         <div style={{marginTop: '17px', marginLeft:'15px', justifyContent: 'center', textAlign:'center',alignItems:'center'}}>
@@ -361,6 +361,8 @@ const StadiumTicket = () => {
           defaultValue=""
           onKeyDown={addMatchDetail}
         />
+        </div>
+        <div>
         <TextField
         style={{marginTop: '15px'}}
           onChange={matchDetailTypeChange}
