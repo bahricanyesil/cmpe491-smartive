@@ -28,7 +28,7 @@ contract WeightedMultipleVoting is ERC20, Pausable, Ownable {
     uint256 public endTime;
 
     constructor(string[] memory candidateNames, uint256 maxVotes, uint256 ownerWeight, uint256 startTime_, uint256 endTime_)
-    ERC20("WeightedToken", "WeTo")    
+    ERC20("WeightedToken", "WeTo")
     {
         voters[msg.sender].voterAddress = msg.sender;
         voters[msg.sender].weight = ownerWeight;
