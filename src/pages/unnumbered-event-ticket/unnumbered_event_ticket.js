@@ -53,7 +53,8 @@ const UnNumberedEventTicket = () => {
         setBeforeLines([
           allLines.slice(0, 10),
           allLines.slice(11, 19),
-          allLines.slice(20, 35),
+          allLines.slice(20, 23),
+          allLines.slice(28, 35),
           allLines.slice(44, 55),
           allLines.slice(57, 59),
           allLines.slice(62, 64),
@@ -91,18 +92,23 @@ const UnNumberedEventTicket = () => {
             `        ${newCategoryItemTypes[j]} ${newCategoryItems[j]};`
           );
         }
-      } else if (i === 2) {
+      }else if(i===2) {
+        for (let j = 0; j < newEventDetailItems.length; j++) {
+          if (!newCheckedEventDetailItems[j]) continue;
+          newLines.push(`        ${eventDetailItemTypes[j]} ${eventDetailItems[j]};`);
+        }
+      }  else if (i === 3) {
         let constructorText = "    constructor(";
         for (let j = 0; j < newEventDetailItems.length; j++) {
           if (!newCheckedEventDetailItems[j]) continue;
-          if (newEventDetailItemTypes[j].includes("string")) {
+          if (newEventDetailItemTypes[j].includes("string") || newEventDetailItemTypes[j].includes("[]")) {
             constructorText += `${newEventDetailItemTypes[j]} memory ${newEventDetailItems[j]}_, `;
           } else {
             constructorText += `${newEventDetailItemTypes[j]} ${newEventDetailItems[j]}_, `;
           }
         }
         constructorText = constructorText.slice(0, constructorText.length - 2);
-        constructorText += `) ERC1155(${targetURIParam}) {`;
+        constructorText += `) ERC1155("${targetURIParam}") {`;
         newLines.push(constructorText);
         if (newCheckedEventDetailItems[0])
           newLines.push(
@@ -126,13 +132,13 @@ const UnNumberedEventTicket = () => {
             lastEl.slice(0, lastEl.length - 1),
           ];
         }
-      } else if (i === 3) {
+      }else if (i === 4) {
         let addCateText =
           "    function addCategory(uint256 price, uint256 capacity";
         for (let j = 0; j < newCategoryItems.length; j++) {
           if (!newCheckedCategoryItems[j]) continue;
           let memoryText = "";
-          if(newCategoryItemTypes[j].includes("string")) memoryText = "memory ";
+          if(newCategoryItemTypes[j].includes("string") || newCategoryItemTypes[j].includes("[]")) memoryText = "memory ";
           addCateText += `, ${newCategoryItemTypes[j]} ${memoryText}${newCategoryItems[j]}`;
         }
         addCateText += ") public onlyOwner {";
@@ -141,13 +147,13 @@ const UnNumberedEventTicket = () => {
           newLines.push(
             '        require(!checkEventPassed(), "Event has already occurred.");'
           );
-      } else if (i === 4) {
+      } else if (i === 5) {
         if(newCheckedCategoryItems[0]) {
           newLines.push("        for(uint256 i=0; i<supplies.length; i++) {");
           newLines.push('            require(!compareStrings(categories[i].name, name), "There is already a category with the same name.");');
           newLines.push("        }");
         }
-      } else if (i === 5) {
+      } else if (i === 6) {
         let createCateModelText = "        categories[tokenId] = EventCategory(tokenId, price, capacity, 0";
         for(let j=0; j<newCategoryItems.length; j++) {
           if(!newCheckedCategoryItems[j]) continue;
@@ -155,12 +161,12 @@ const UnNumberedEventTicket = () => {
         }
         createCateModelText += ');';
         newLines.push(createCateModelText);
-      } else if (i === 6) {
+      } else if (i === 7) {
         if (newCheckedEventDetailItems[0])
           newLines.push(
             '        require(!checkEventPassed(), "Event has already occurred.");'
           );
-      } else if (i === 7) {
+      } else if (i === 8) {
         if (newCheckedEventDetailItems[0]) {
           newLines.push(
             "    function checkEventPassed() private returns (bool) {"
@@ -174,14 +180,14 @@ const UnNumberedEventTicket = () => {
           newLines.push("        return false;");
           newLines.push("    }");
         }
-      } else if (i === 8) {
+      } else if (i === 9) {
+        if (newCheckedEventDetailItems[0])
+          newLines.push("        whenNotPaused");
+      } else if (i === 10) {
         if (newCheckedEventDetailItems[0])
           newLines.push(
             '        require(!checkEventPassed(), "Event has already occurred.");'
           );
-      } else if (i === 9) {
-        if (newCheckedEventDetailItems[0])
-          newLines.push("        whenNotPaused");
       }
     }
     setContractCode(newLines.join("\n"));
@@ -242,11 +248,16 @@ const UnNumberedEventTicket = () => {
 
   const addNewEventDetail = (e) => {
     if (e.key != "Enter") return;
+    if(eventDetailItems.includes(newEventDetailName)) {
+      alert("Please enter a unique name");
+      return;
+    }
     const val = newEventDetailType;
     if (
       val !== "string" &&
       val !== "string[]" &&
       val !== "uint256" &&
+      val !== "uint256[]" &&
       val !== "bool" &&
       val !== "address" &&
       val !== "bytes" &&
@@ -261,6 +272,7 @@ const UnNumberedEventTicket = () => {
     if (
       newEventDetailName == "string" ||
       newEventDetailName == "string[]" ||
+      newEventDetailName == "uint256[]" ||
       newEventDetailName == "uint256" ||
       newEventDetailName == "bool" ||
       newEventDetailName == "address" ||
@@ -297,6 +309,10 @@ const UnNumberedEventTicket = () => {
 
   const addNewCategoryItem = (e) => {
     if (e.key != "Enter") return;
+    if(categoryItems.includes(newCategoryItemName)) {
+      alert("Please enter a unique name");
+      return;
+    }
     const val = newCategoryItemType;
     if (
       val !== "string" &&
@@ -304,6 +320,7 @@ const UnNumberedEventTicket = () => {
       val !== "uint256" &&
       val !== "bool" &&
       val !== "address" &&
+      val !== "uint256[]" &&
       val !== "bytes" &&
       val != "uint128" &&
       val != "uint64" &&
@@ -316,6 +333,7 @@ const UnNumberedEventTicket = () => {
     if (
       newCategoryItemName == "string" ||
       newCategoryItemName == "string[]" ||
+      newCategoryItemName == "uint256[]" ||
       newCategoryItemName == "uint256" ||
       newCategoryItemName == "bool" ||
       newCategoryItemName == "address" ||
@@ -397,7 +415,7 @@ const UnNumberedEventTicket = () => {
       >
         <h3 style={{ textAlign: "center" }}>Edit the Parameters</h3>
         <div style={{ padding: "16px 24px", color: "#44596e" }}>
-          <h5>Enter Token Name</h5>
+          <h5>Enter Contract Name</h5>
           <Box
             component="form"
             sx={{
@@ -447,7 +465,14 @@ const UnNumberedEventTicket = () => {
               Event Details
             </Divider>
             {eventCheckboxViews}
-          </FormGroup>
+          </FormGroup><Box
+            component="form"
+            sx={{
+              "& .MuiTextField-root": { m: 1, width: "25ch" },
+            }}
+            noValidate
+            autoComplete="off"
+          > 
           <div>
             <TextField
               style={{ marginTop: "15px" }}
@@ -468,6 +493,7 @@ const UnNumberedEventTicket = () => {
               onKeyDown={addNewEventDetail}
             />
           </div>
+          </Box>
           <FormGroup>
             <Divider
               style={{ marginTop: "30px", marginBottom: "20px" }}
@@ -476,7 +502,14 @@ const UnNumberedEventTicket = () => {
               Category Items
             </Divider>
             {categoryCheckboxViews}
-          </FormGroup>
+          </FormGroup><Box
+            component="form"
+            sx={{
+              "& .MuiTextField-root": { m: 1, width: "25ch" },
+            }}
+            noValidate
+            autoComplete="off"
+          > 
           <div>
             <TextField
               style={{ marginTop: "15px" }}
@@ -496,7 +529,7 @@ const UnNumberedEventTicket = () => {
               defaultValue=""
               onKeyDown={addNewCategoryItem}
             />
-          </div>
+          </div></Box>
         </div>
       </div>
     </div>
