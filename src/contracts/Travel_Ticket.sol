@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity >= 0.8.0;
-
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+
+pragma solidity >= 0.8.0;
 
 contract TravelTicket is ERC721, Pausable, Ownable {
     using Counters for Counters.Counter;
@@ -56,9 +56,7 @@ contract TravelTicket is ERC721, Pausable, Ownable {
     mapping (uint256 => SeatBlock) public seatBlocks;
     uint256[] public supplies;
 
-    constructor(uint256 startDate_, uint256 duration_, string memory locationFrom_, string memory locationTo_,
-        string memory eventName_, uint8 vehicleType_) ERC721("TravelTicketToken", "TraT") {
-        
+    constructor(uint256 startDate_, uint256 duration_, string memory locationFrom_, string memory locationTo_, string memory eventName_, uint8 vehicleType_) ERC721("TravelTicketToken", "TraT") {
         require(startDate_ > block.timestamp, "You can not set start time of the match to a past date.");
         require(duration_ > 0, "The duration should be greater than 0.");
         require(vehicleType_ >= uint8(VehicleType.PLANE) && vehicleType_ <= uint8(VehicleType.OTHER), "The vehicle type is out of bounds.");
@@ -84,8 +82,7 @@ contract TravelTicket is ERC721, Pausable, Ownable {
             require(!compareStrings(seatBlocks[i].name, name), "There is already a block with the same name.");
         }
         uint256 blockId = _blockIdCounter.current();
-        _blockIdCounter.increment();
-        
+        _blockIdCounter.increment(); 
         seatBlocks[blockId].blockId = blockId;
         seatBlocks[blockId].price = price;
         seatBlocks[blockId].name = name;

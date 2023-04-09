@@ -37,7 +37,7 @@ contract Clothing is ERC1155, Ownable {
     uint256[] public supplies;
     uint256 public lastUpdate;
 
-    constructor() ERC1155("  ") {
+    constructor() ERC1155("") {
         lastUpdate = block.timestamp;
     }
 
