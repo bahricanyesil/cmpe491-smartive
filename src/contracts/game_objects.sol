@@ -46,9 +46,7 @@ contract GameObject is ERC1155, Ownable {
         lastUpdate = block.timestamp;
     }
 
-    function addNewGameItem(uint256 price, uint256 gameId, string memory name, uint8 itemType, uint8 rareness,
-        uint256 amount) public onlyOwner {
-        
+    function addNewGameItem(uint256 price, uint256 gameId, string memory name, uint8 itemType, uint8 rareness, uint256 amount) public onlyOwner {
         require(itemType >= uint8(ItemType.CHARACTER) && itemType <= uint8(ItemType.OTHER), "Type of game item is out of range");
         require(rareness >= uint8(Rareness.COMMON) && rareness <= uint8(Rareness.OTHER), "Rareness of game item is out of range");
         require(price >= 0, "Price must not be a negative number");
@@ -57,7 +55,6 @@ contract GameObject is ERC1155, Ownable {
         for(uint256 i = 0; i < supplies.length; i++) {
             require(!compareStrings(gameItems[i].name, name), "There is already a game item with the same name.");
         }
-
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
         gameItems[tokenId] = GameItem(tokenId, price, gameId, name, ItemType(itemType), Rareness(rareness), 0);
@@ -108,9 +105,7 @@ contract GameObject is ERC1155, Ownable {
         return orders[msg.sender];
     }
 
-    function updateGameItem(uint256 gameItemId, uint256 price, uint256 gameId, string memory name, uint8 itemType, 
-        uint8 rareness) public onlyOwner {
-        
+    function updateGameItem(uint256 gameItemId, uint256 price, uint256 gameId, string memory name, uint8 itemType, uint8 rareness) public onlyOwner {
         require(supplies.length > 0, "There is no game item to update.");
         require(gameItemId <= supplies.length-1 && gameItemId >= 0, "Game item does not exist.");
         require(itemType >= uint8(ItemType.CHARACTER) && itemType <= uint8(ItemType.OTHER), "Type of game item is out of range");
@@ -121,7 +116,6 @@ contract GameObject is ERC1155, Ownable {
         for(uint256 i = 0; i < supplies.length; i++) {
             require(!compareStrings(gameItems[i].name, name), "There is already a game item with the same name.");
         }
-
         gameItems[gameItemId].price = price;
         gameItems[gameItemId].gameId = gameId;
         gameItems[gameItemId].name = name;

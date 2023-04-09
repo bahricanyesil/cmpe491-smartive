@@ -166,7 +166,6 @@ const Clothing = () => {
     ];
     setClothingTypesSelected(newClothingTypesSelected);
     setNewContract({newClothingTypesSelected: newClothingTypesSelected});
-    //setNewContract(contractName, contractURI, newClothingTypesSelected);
   };
 
   const setClothingSize = (checked, size) => {
@@ -178,7 +177,6 @@ const Clothing = () => {
     ];
     setClothingSizesSelected(newClothingSizesSelected);
     setNewContract({newClothingSizesSelected: newClothingSizesSelected});
-    //setNewContract(contractName, contractURI, newClothingSizesSelected);
   };
 
   const setClothingColor = (checked, color) => {
@@ -190,7 +188,6 @@ const Clothing = () => {
     ];
     setClothingColorsSelected(newClothingColorsSelected);
     setNewContract({newClothingColorsSelected: newClothingColorsSelected});
-    //setNewContract(contractName, contractURI, newClothingColorsSelected);
   };
 
   const setClothingItemProperty = (checked, i) => {
@@ -201,27 +198,16 @@ const Clothing = () => {
     ];
     setClothingItemPropertiesSelected(newSelectedPropertyList);
     setNewContract({newClothingItemPropertiesSelected: newSelectedPropertyList});
-    /*setNewContract(
-      contractName,
-      contractURI,
-      menuItems,
-      menuItemTypes,
-      menuItemProperties,
-      newCheckedPropertyList,
-      menuItemPropertiesTypes
-    );*/
   };
 
   const targetNameChange = (event) => {
     setContractName(event.target.value);
     setNewContract({newContractName: event.target.value});
-    //setNewContract(event.target.value, contractURI, menuItems);
   };
 
   const targetURIChange = (event) => {
     setContractURI(event.target.value);
     setNewContract({targetURIParam: event.target.value});
-    //setNewContract(contractName, event.target.value, menuItems);
   };
 
   const clothingTypeChange = (event) => {
@@ -262,7 +248,8 @@ const Clothing = () => {
       val != "uint128" &&
       val != "uint64" &&
       val != "uint32" &&
-      val != "uint16"
+      val != "uint16" &&
+      val != "uint8"
     ) {
       alert("Please enter a valid type");
       return;
@@ -279,6 +266,7 @@ const Clothing = () => {
       newClothingItemProperty == "uint64" ||
       newClothingItemProperty == "uint32" ||
       newClothingItemProperty == "uint16" ||
+      newClothingItemProperty == "uint8" ||
       newClothingItemProperty == "ClothingType" ||
       newClothingItemProperty == "ClothingSize" ||
       newClothingItemProperty == "ClothingColor"
@@ -306,15 +294,6 @@ const Clothing = () => {
         newClothingItemPropertiesSelected: newClothingItemPropertiesSelected,
         newClothingItemPropertiesTypes: newClothingItemPropertiesTypes
       });
-      /*setNewContract(
-        contractName,
-        contractURI,
-        menuItems,
-        menuItemTypes,
-        newMenuItemProperties,
-        newMenuItemPropertiesCheck,
-        newMenuItemPropertiesTypes
-      );*/
     }
   };
 
@@ -333,12 +312,6 @@ const Clothing = () => {
       setClothingTypes(newClothingTypes);
       setNewClothingType("");
       setNewContract({newClothingTypesSelected: newClothingTypesSelected, newClothingTypes: newClothingTypes});
-      /*setNewContract(
-        contractName,
-        contractURI,
-        newMenuItemsCheck,
-        newMenuItemTypes
-      );*/
     }
   };
 
@@ -357,12 +330,6 @@ const Clothing = () => {
       setClothingSizes(newClothingSizes);
       setNewClothingSize("");
       setNewContract({newClothingSizesSelected: newClothingSizesSelected, newClothingSizes: newClothingSizes});
-      /*setNewContract(
-        contractName,
-        contractURI,
-        newMenuItemsCheck,
-        newMenuItemTypes
-      );*/
     }
   };
 
@@ -381,12 +348,6 @@ const Clothing = () => {
       setClothingColors(newClothingColors);
       setNewClothingColor("");
       setNewContract({newClothingColorsSelected: newClothingColorsSelected, newClothingColors: newClothingColors});
-      /*setNewContract(
-        contractName,
-        contractURI,
-        newMenuItemsCheck,
-        newMenuItemTypes
-      );*/
     }
   };
 
@@ -409,11 +370,11 @@ const Clothing = () => {
     newClothingTypes = newClothingTypes || clothingTypes;
     newClothingSizesSelected = newClothingSizesSelected || clothingSizesSelected;
     newClothingSizes = newClothingSizes || clothingSizes;
-    newClothingColorsSelected = newClothingColorsSelected || clothingColorsSelected,
-    newClothingColors = newClothingColors || clothingColors,
-    newClothingItemProperties = newClothingItemProperties || clothingItemProperties,
-    newClothingItemPropertiesSelected = newClothingItemPropertiesSelected || clothingItemPropertiesSelected,
-    newClothingItemPropertiesTypes = newClothingItemPropertiesTypes || clothingItemPropertiesTypes
+    newClothingColorsSelected = newClothingColorsSelected || clothingColorsSelected;
+    newClothingColors = newClothingColors || clothingColors;
+    newClothingItemProperties = newClothingItemProperties || clothingItemProperties;
+    newClothingItemPropertiesSelected = newClothingItemPropertiesSelected || clothingItemPropertiesSelected;
+    newClothingItemPropertiesTypes = newClothingItemPropertiesTypes || clothingItemPropertiesTypes;
 
     let newLines = [];
 
@@ -464,7 +425,9 @@ const Clothing = () => {
       if (i === 0) {
         newLines.push(`contract ${newContractName} is ERC1155, Ownable {`);
       } else if (i === 1) {
-        newLines.push(clothingTypeLine + '\n' + clothingSizeLine + '\n' + clothingColorLine);
+        newLines.push(clothingTypeLine);
+        newLines.push(clothingSizeLine);
+        newLines.push(clothingColorLine);
       } else if (i === 2) {
         for (let j = 0; j < newClothingItemProperties.length; j++) {
           if (!newClothingItemPropertiesSelected[j]) continue;
