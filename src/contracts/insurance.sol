@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract Insurance is ERC20, Ownable{
+
     using SafeMath for uint256;
     address Owner;
     uint256 maxUsableAmount;
@@ -28,20 +29,28 @@ contract Insurance is ERC20, Ownable{
     constructor(uint256 _firstTokenSetPrice, uint256 _extraTokenPrice, address payable _wallet, uint256 _totalSupply, uint256 _firstTokenSetAmount )
     ERC20("InsuranceToken", "ISK")
     {
-        Owner = msg.sender;
         firstTokenSetPrice = _firstTokenSetPrice;
         wallet = _wallet;
         extraTokenPrice = _extraTokenPrice;
         firstTokenSetAmount = _firstTokenSetAmount;
          _mint(msg.sender, _totalSupply);
-       
+        Owner = msg.sender;
     }
+    
+   
+   
+
     
     function addInsuranceMember(address _memberAddress) public onlyOwner{
         require(!members[_memberAddress].validMember);
         members[_memberAddress].validMember = true;
         members[_memberAddress].memberAddress = _memberAddress;
+
+       
+
     }
+
+
 
     function approve(address spender, uint256 amount) public virtual override onlyOwner returns (bool) {
         address owner = _msgSender();
@@ -70,6 +79,8 @@ contract Insurance is ERC20, Ownable{
          super.transferFrom(Owner,msg.sender,1);
         wallet.transfer(msg.value);
     }
+
+
 }
 
 library SafeMath {
@@ -84,6 +95,5 @@ library SafeMath {
       return c;
     }
 }
-
 
 
