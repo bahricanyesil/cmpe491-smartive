@@ -39,16 +39,16 @@ contract ClinicalTrialData is ERC1155, Ownable, AccessControl {
     }
     
     struct Doctor {
-        string name;
         address doctorAddress;
         uint256 enteredDataNumber;
         uint256 soldDataNumber;
+        string name;
     }
 
     struct ClinicalDataCenter {
+        address addressInfo;
         string name;
         uint256 workerCapacity;
-        address addressInfo;
     }
 
     mapping(uint256 => PatientOverview) patientOverviews;
@@ -65,25 +65,25 @@ contract ClinicalTrialData is ERC1155, Ownable, AccessControl {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
 
-    function addDoctor(string memory name, address doctorAddress) public onlyOwner {
+    function addDoctor( address doctorAddress, string memory name) public onlyOwner {
         require(doctors[msg.sender].doctorAddress == address(0), "Doctor has already added.");
-        doctors[doctorAddress] = Doctor(name, doctorAddress, 0, 0);
+        doctors[doctorAddress] = Doctor(doctorAddress, 0, 0, name);
         _grantRole(DOCTOR_ROLE, doctorAddress);
         doctorList.push(doctorAddress);
     }
 
-    function addDataCenter(string memory name, uint256 workerCapacity, address dataCenterAddress) public onlyOwner {
+    function addDataCenter(address dataCenterAddress, string memory name, uint256 workerCapacity) public onlyOwner {
         require(dataCenters[msg.sender].addressInfo == address(0), "Data center has already added.");
-        dataCenters[dataCenterAddress] = ClinicalDataCenter(name, workerCapacity, dataCenterAddress);
+        dataCenters[dataCenterAddress] = ClinicalDataCenter(dataCenterAddress, name, workerCapacity);
         _grantRole(DATA_CENTER_ROLE, dataCenterAddress);
         dataCenterList.push(dataCenterAddress);
     }
 
     function addPatient(uint256 age, uint8 genderIndex, string[] memory diseases, string[] memory drugs) public onlyRole(DOCTOR_ROLE) payable {
-        require(genderIndex <= uint8(Gender.OTHER), "Gender is out of range.");
-        require(age > 0, "Please enter a valid age.");
-        require(diseases.length > 0, "Disases can not be empty.");
-        require(msg.value >= dataEnterPrice, "You don't have enough price.");
+        require(genderIndex <= uint8(Gender.OTHER));
+        require(age > 0);
+        require(diseases.length > 0);
+        require(msg.value >= dataEnterPrice);
         uint256 patientId = _patientIdCounter.current();
         _patientIdCounter.increment();
         Patient storage patientEntered = patients[patientId];
