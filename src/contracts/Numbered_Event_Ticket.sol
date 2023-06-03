@@ -1522,12 +1522,12 @@ contract NumberedEventTicket is ERC721, Pausable, Ownable {
     struct SeatBlock {
         uint256 blockId;
         uint256 price;
-        string name;
         uint256 totalRowNumber;
         uint256 createdRowNumber;
         uint256 capacity;
         uint256[] rowIds;
         mapping(uint256 => SeatRow) seatRows;
+        string name;
     }
 
     struct EventDetails {
@@ -1576,7 +1576,7 @@ contract NumberedEventTicket is ERC721, Pausable, Ownable {
         return cellItems;
     }
 
-    function addBlock(uint256 price, string memory name, uint256 totalRowNumber_) public onlyOwner {
+    function addBlock(uint256 price, uint256 totalRowNumber_ string memory name) public onlyOwner {
         require(!checkEventPassed(), "Event has already occurred.");
         require(price >= 0, "Price should be greater than or equal to 0.");
         require(totalRowNumber_ > 0, "The block has to have at least 1 row.");
@@ -1593,6 +1593,20 @@ contract NumberedEventTicket is ERC721, Pausable, Ownable {
         seatBlocks[blockId].capacity = 0;
         supplies.push(0);
         seatBlockList.push(blockId);
+    }
+
+     function buyTicket(uint256 blockId, uint256 rowId, uint256 cellId) public payable {
+        require(!checkEventPassed(), "Event has already occurred.");
+        require(supplies.length > 0, "There is no block to buy ticket");
+        require(seatBlocks[blockId].totalRowNumber > 0, "There is no block with the given block id.");
+        require(seatBlocks[blockId].seatRows[rowId].totalCapacity > 0, "There is no row with the given row id.");
+        require(cellId < seatBlocks[blockId].seatRows[rowId].totalCapacity, "Seat number is the greater than the last seat in this row.");
+        require(cellId >= 0, "Seat number is the less than the first seat in this row.");
+        uint256 tokenId = cellId + seatBlocks[blockId].seatRows[rowId].firstCellId;
+        require(!seatBlocks[blockId].seatRows[rowId].cells[tokenId], "The seat has already sold.");
+        require(msg.value >= seatBlocks[blockId].price, "You don't have enough price.");
+        _safeMint(msg.sender, tokenId);
+        seatBlocks[blockId].seatRows[rowId].cells[tokenId] = true;
     }
 
     function addBlockRow(uint256 blockId, uint256 capacity_) public onlyOwner {
@@ -1618,22 +1632,17 @@ contract NumberedEventTicket is ERC721, Pausable, Ownable {
         supplies[blockId] += capacity_;
     }
 
-    function buyTicket(uint256 blockId, uint256 rowId, uint256 cellId) public payable {
-        require(!checkEventPassed(), "Event has already occurred.");
-        require(supplies.length > 0, "There is no block to buy ticket");
-        require(seatBlocks[blockId].totalRowNumber > 0, "There is no block with the given block id.");
-        require(seatBlocks[blockId].seatRows[rowId].totalCapacity > 0, "There is no row with the given row id.");
-        require(cellId < seatBlocks[blockId].seatRows[rowId].totalCapacity, "Seat number is the greater than the last seat in this row.");
-        require(cellId >= 0, "Seat number is the less than the first seat in this row.");
-        uint256 tokenId = cellId + seatBlocks[blockId].seatRows[rowId].firstCellId;
-        require(!seatBlocks[blockId].seatRows[rowId].cells[tokenId], "The seat has already sold.");
-        require(msg.value >= seatBlocks[blockId].price, "You don't have enough price.");
-        _safeMint(msg.sender, tokenId);
-        seatBlocks[blockId].seatRows[rowId].cells[tokenId] = true;
-    }
 
     function compareStrings(string memory a, string memory b) private pure returns (bool) {
         return (keccak256(abi.encodePacked((a))) == keccak256(abi.encodePacked((b))));
+    }
+
+    function checkEventPassed() private returns (bool) {
+        if(block.timestamp >= eventDetails.startDate) {
+            _pause();
+            return true;
+        }
+        return false;
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 tokenId, uint256 batchSize)
@@ -1644,13 +1653,6 @@ contract NumberedEventTicket is ERC721, Pausable, Ownable {
         super._beforeTokenTransfer(from, to, tokenId, batchSize);
     }
 
-    function checkEventPassed() private returns (bool) {
-        if(block.timestamp >= eventDetails.startDate) {
-            _pause();
-            return true;
-        }
-        return false;
-    }
 
     function withdraw() public onlyOwner {
         require(address(this).balance > 0, "Balance is 0.");

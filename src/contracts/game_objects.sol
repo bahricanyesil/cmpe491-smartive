@@ -565,15 +565,10 @@ contract GameObjects is ERC1155, Ownable {
     struct GameItem {
         uint256 tokenId;
         uint256 price;
-        uint256 gameId;
-        string name;
+        uint256 numberOfSales;
         ItemType itemType;
         Rareness rareness;
-        uint256 numberOfSales;
-    }
-
-    struct Game {
-        uint256 tokenId;
+        string name;
         string gameName;
     }
 
@@ -585,43 +580,28 @@ contract GameObjects is ERC1155, Ownable {
     }
 
     mapping (uint256 => GameItem) public gameItems;
-    mapping (uint256 => Game) public games;
     mapping (address => Order) private orders;
     uint256[] public supplies;
-    uint256[] public gameList;
     uint256 public lastUpdate;
 
     constructor() ERC1155("") {
         lastUpdate = block.timestamp;
     }
 
-    function addNewGameItem(uint256 price, uint256 gameId, string memory name, uint8 itemType, uint8 rareness,
-        uint256 amount) public onlyOwner {
-        
-        require(itemType >= uint8(ItemType.CHARACTER) && itemType <= uint8(ItemType.OTHER), "Type of game item is out of range");
-        require(rareness >= uint8(Rareness.COMMON) && rareness <= uint8(Rareness.OTHER), "Rareness of game item is out of range");
+    function addNewGameItem(uint256 price, uint8 itemType, uint8 rareness, uint256 amount, string memory name,  string memory gameName) public onlyOwner {
+        require(itemType <= uint8(ItemType.OTHER), "Type of game item is out of range");
+        require(rareness <= uint8(Rareness.OTHER), "Rareness of game item is out of range");
         require(price >= 0, "Price must not be a negative number");
-        require(gameId >= 0 && gameId < gameList.length, "Game with the given gameId could not be found");
         require(!isEmpty(name), "Name of game item must be entered");
+        require(!isEmpty(gameName), "Name of game must be entered");
         for(uint256 i = 0; i < supplies.length; i++) {
             require(!compareStrings(gameItems[i].name, name), "There is already a game item with the same name.");
         }
-
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
-        gameItems[tokenId] = GameItem(tokenId, price, gameId, name, ItemType(itemType), Rareness(rareness), 0);
+        gameItems[tokenId] = GameItem(tokenId, price, 0, ItemType(itemType), Rareness(rareness), name, gameName);
         supplies.push(amount);
         _mint(owner(), tokenId, amount, "");
-    }
-
-    function addNewGame(string memory name) public onlyOwner {
-        require(!isEmpty(name), "Name of game must be entered");
-        for(uint256 i = 0; i < gameList.length; i++) {
-            require(!compareStrings(games[i].gameName, name), "There is already a game with the same name");
-        }
-        uint256 tempGameId = gameList.length;
-        games[tempGameId] = Game(tempGameId, name);
-        gameList.push(tempGameId);
     }
 
     function getCatalog() public view returns(uint256[] memory availableGameItemList) {
@@ -647,35 +627,28 @@ contract GameObjects is ERC1155, Ownable {
         return gameItems[_gameItemId];
     }
 
-    function getGameById(uint256 _gameId) private view returns(Game memory game) {
-        require(_gameId >= 0 && _gameId < gameList.length, "Game with the given gameId could not be found");
-        return games[_gameId];
-    }
-
     function getAddressOrder() private view returns(Order memory order) {
         require(orders[msg.sender].amount > 0, "You don't have any order.");
         return orders[msg.sender];
     }
 
-    function updateGameItem(uint256 gameItemId, uint256 price, uint256 gameId, string memory name, uint8 itemType, 
-        uint8 rareness) public onlyOwner {
-        
+    function updateGameItem(uint256 gameItemId, uint256 price, uint8 itemType, uint8 rareness, string memory name, string memory gameName) public onlyOwner {
+        require(itemType <= uint8(ItemType.OTHER), "Type of game item is out of range");
+        require(rareness <= uint8(Rareness.OTHER), "Rareness of game item is out of range");
+        require(price >= 0, "Price must not be a negative number");
+        require(!isEmpty(name), "Name of game item must be entered");
+        require(!isEmpty(gameName), "Name of game must be entered");
         require(supplies.length > 0, "There is no game item to update.");
         require(gameItemId <= supplies.length-1 && gameItemId >= 0, "Game item does not exist.");
-        require(itemType >= uint8(ItemType.CHARACTER) && itemType <= uint8(ItemType.OTHER), "Type of game item is out of range");
-        require(rareness >= uint8(Rareness.COMMON) && rareness <= uint8(Rareness.OTHER), "Rareness of game item is out of range");
-        require(price >= 0, "Price must not be a negative number");
-       require(gameId >= 0 && gameId < gameList.length, "Game with the given gameId could not be found");
-        require(!isEmpty(name), "Name of game item must be entered");
         for(uint256 i = 0; i < supplies.length; i++) {
             require(!compareStrings(gameItems[i].name, name), "There is already a game item with the same name.");
         }
-
         gameItems[gameItemId].price = price;
-        gameItems[gameItemId].gameId = gameId;
-        gameItems[gameItemId].name = name;
         gameItems[gameItemId].itemType = ItemType(itemType);
         gameItems[gameItemId].rareness = Rareness(rareness);
+        gameItems[gameItemId].name = name;
+        gameItems[gameItemId].gameName = gameName;
+        lastUpdate = block.timestamp;
     }
 
     function produceGameItem(uint256 gameItemId, uint256 amount) public onlyOwner {
@@ -683,6 +656,7 @@ contract GameObjects is ERC1155, Ownable {
         require(gameItemId <= supplies.length-1 && gameItemId >= 0, "Game item does not exist.");
         supplies[gameItemId] = supplies[gameItemId] + amount;
         _mint(owner(), gameItemId, amount, "");
+        lastUpdate = block.timestamp;
     }
 
     function buyGameItem(uint256 gameItemId, uint256 amount) public payable {
@@ -695,6 +669,7 @@ contract GameObjects is ERC1155, Ownable {
         _safeTransferFrom(owner(), msg.sender, gameItemId, amount, "");
         gameItems[gameItemId].numberOfSales += amount;
         orders[msg.sender] = Order(gameItemId, msg.sender, amount, false);
+        lastUpdate = block.timestamp;
     }
 
     function receiveGameItem(uint256 gameItemId, uint256 amount) public {
@@ -705,6 +680,7 @@ contract GameObjects is ERC1155, Ownable {
         require(orders[msg.sender].amount > 0, "You don't have any order to receive.");
         orders[msg.sender].received = true;
         _burn(msg.sender, gameItemId, amount);
+        lastUpdate = block.timestamp;
     }
 
     function isEmpty(string memory str) private pure returns (bool) {
@@ -720,5 +696,4 @@ contract GameObjects is ERC1155, Ownable {
         (bool success, ) = payable(owner()).call{value: address(this).balance}("");
         require(success, "Withdraw couldn't be completed.");
     }
-
 }
