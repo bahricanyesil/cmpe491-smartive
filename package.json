@@ -3,10 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@agnostico/browser-solidity-compiler": "^0.1.1",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@mui/icons-material": "^5.11.0",
     "@mui/material": "^5.11.4",
+    "@openzeppelin/contracts": "^4.9.0",
+    "@remix-project/remix-solidity": "^0.5.12",
     "@testing-library/jest-dom": "^5.16.5",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -24,7 +27,7 @@
     "react-syntax-highlighter": "^15.5.0",
     "styled-components": "^5.3.6",
     "web-vitals": "^2.1.4",
-    "web3": "^1.8.1"
+    "web3": "^1.10.0"
   },
   "scripts": {
     "start": "react-scripts start",
