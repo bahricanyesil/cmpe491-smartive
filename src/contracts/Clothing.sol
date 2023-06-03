@@ -559,19 +559,19 @@ contract Clothing is ERC1155, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIdCounter;
 
-    enum ClothingType {TSHIRT, SHIRT, PANTS, HOODIES, SWEATER, SHORTS, SKIRTS, RAINCOAT, UNDERWEAR, GYMCLOTHES, TANKTOP, PAJAMA, SWIMSUIT, BATHROBE, COAT, SCARF, SUIT, OTHER }
-    enum ClothingSize {XXS, XS, S, SM, M, ML, MT, L, LT, XL, XLT, XXL, XXLT, XXXL, XXXLT, XXXXL, XXXXLT, OTHER }
-    enum ClothingColor {RED, GREEN, BLACK, WHITE, BLUE, YELLOW, GREY, PURPLE, PINK, ORANGE, BROWN, OTHER }
+    enum ClothingType {TSHIRT, SHIRT, PANTS, HOODIES, SWEATER, SHORTS, SKIRTS, RAINCOAT, UNDERWEAR, GYMCLOTHES, TANKTOP, PAJAMA, SWIMSUIT, BATHROBE, COAT, SCARF, SUIT, OTHER}
+    enum ClothingSize {XXS, XS, S, SM, M, ML, MT, L, LT, XL, XLT, XXL, XXLT, XXXL, XXXLT, XXXXL, XXXXLT, OTHER}
+    enum ClothingColor {RED, GREEN, BLACK, WHITE, BLUE, YELLOW, GREY, PURPLE, PINK, ORANGE, BROWN, OTHER}
     
     struct ClothingItem {
         uint256 tokenId;
         uint256 price;
+        uint256 numberOfSales;
+        ClothingType clothingType;
+        ClothingSize clothingSize;
+        ClothingColor clothingColor;
         string name;
         string brand;
-        ClothingType clothingType;
-        ClothingSize size;
-        ClothingColor color;
-        uint256 numberOfSales;
     }
 
     struct Order {
@@ -590,23 +590,19 @@ contract Clothing is ERC1155, Ownable {
         lastUpdate = block.timestamp;
     }
 
-    function addNewClothingItem(uint256 price, string memory name, string memory brand, uint8 clothingType, uint8 size,
-        uint8 color, uint256 amount) public onlyOwner {
-        
-        require(clothingType >= uint8(ClothingType.TSHIRT) && clothingType <= uint8(ClothingType.OTHER), "Clothing item type is out of range");
-        require(size >= uint8(ClothingSize.XXS) && size <= uint8(ClothingSize.OTHER), "Clothing size is out of range");
-        require(color >= uint8(ClothingColor.RED) && color <= uint8(ClothingColor.OTHER), "Clothing color is out of range");
-        require(price >= 0, "Price must not be a negative number");
-        require(!isEmpty(brand), "Brand name must be entered");
+    function addNewClothingItem(uint256 price, uint8 clothingType, uint8 clothingSize, uint8 clothingColor, uint256 amount, string memory name, string memory brand) public onlyOwner {
+        require(clothingType <= uint8(ClothingType.OTHER), "Clothing type is out of range");
+        require(clothingSize <= uint8(ClothingSize.OTHER), "Clothing size is out of range");
+        require(clothingColor <= uint8(ClothingColor.OTHER), "Clothing color is out of range");
+        require(price >= 0, "Price should be greater than or equal to 0.");
         require(!isEmpty(name), "Name must be entered");
-        for(uint256 i = 0; i < supplies.length; i++) {
+        require(!isEmpty(brand), "Brand name must be entered");
+        for(uint256 i=0; i<supplies.length; i++) {
             require(!compareStrings(clothingItems[i].name, name), "There is already a clothing item with the same name.");
         }
-
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
-        clothingItems[tokenId] = ClothingItem(tokenId, price, name, brand, ClothingType(clothingType), ClothingSize(size),
-            ClothingColor(color), 0);
+        clothingItems[tokenId] = ClothingItem(tokenId, price, 0, ClothingType(clothingType), ClothingSize(clothingSize), ClothingColor(clothingColor), name, brand);
         supplies.push(amount);
         _mint(owner(), tokenId, amount, "");
     }
@@ -639,27 +635,25 @@ contract Clothing is ERC1155, Ownable {
         return orders[msg.sender];
     }
 
-    function updateClothingItem(uint256 clothingItemId, uint256 price, string memory name, string memory brand,
-        uint8 clothingType, uint8 size, uint8 color) public onlyOwner {
-        
-        require(clothingType >= uint8(ClothingType.TSHIRT) && clothingType <= uint8(ClothingType.OTHER), "Clothing item type is out of range");
-        require(size >= uint8(ClothingSize.XXS) && size <= uint8(ClothingSize.OTHER), "Clothing size is out of range");
-        require(color >= uint8(ClothingColor.RED) && color <= uint8(ClothingColor.OTHER), "Clothing color is out of range");
-        require(price >= 0, "Price must not be a negative number");
-        require(isEmpty(brand), "Brand name must be entered");
-        require(isEmpty(name), "Name must be entered");
+    function updateClothingItem(uint256 clothingItemId, uint256 price, uint8 clothingType, uint8 clothingSize, uint8 clothingColor, string memory name, string memory brand) public onlyOwner {
+        require(clothingType <= uint8(ClothingType.OTHER), "Clothing type is out of range");
+        require(clothingSize <= uint8(ClothingSize.OTHER), "Clothing size is out of range");
+        require(clothingColor <= uint8(ClothingColor.OTHER), "Clothing color is out of range");
+        require(price >= 0, "Price should be greater than or equal to 0.");
+        require(!isEmpty(name), "Name must be entered");
+        require(!isEmpty(brand), "Brand name must be entered");
         require(supplies.length > 0, "There is no clothing item to update.");
         require(clothingItemId <= supplies.length-1 && clothingItemId >= 0, "Clothing item does not exist.");
         for(uint256 i=0; i<supplies.length; i++) {
             require(!compareStrings(clothingItems[i].name, name), "There is already a clothing item with the same name.");
         }
-
         clothingItems[clothingItemId].price = price;
+        clothingItems[clothingItemId].clothingType = ClothingType(clothingType);
+        clothingItems[clothingItemId].clothingSize = ClothingSize(clothingSize);
+        clothingItems[clothingItemId].clothingColor = ClothingColor(clothingColor);
         clothingItems[clothingItemId].name = name;
         clothingItems[clothingItemId].brand = brand;
-        clothingItems[clothingItemId].clothingType = ClothingType(clothingType);
-        clothingItems[clothingItemId].size = ClothingSize(size);
-        clothingItems[clothingItemId].color = ClothingColor(color);
+        lastUpdate = block.timestamp;
     }
 
     function produceClothingItem(uint256 clothingItemId, uint256 amount) public onlyOwner {
@@ -667,6 +661,7 @@ contract Clothing is ERC1155, Ownable {
         require(clothingItemId <= supplies.length-1 && clothingItemId >= 0, "Clothing item does not exist.");
         supplies[clothingItemId] = supplies[clothingItemId] + amount;
         _mint(owner(), clothingItemId, amount, "");
+        lastUpdate = block.timestamp;
     }
 
     function buyClothingItem(uint256 clothingItemId, uint256 amount) public payable {
@@ -679,6 +674,7 @@ contract Clothing is ERC1155, Ownable {
         _safeTransferFrom(owner(), msg.sender, clothingItemId, amount, "");
         clothingItems[clothingItemId].numberOfSales += amount;
         orders[msg.sender] = Order(clothingItemId, msg.sender, amount, false);
+        lastUpdate = block.timestamp;
     }
 
     function receiveClothingItem(uint256 clothingId, uint256 amount) public {
@@ -689,10 +685,10 @@ contract Clothing is ERC1155, Ownable {
         require(orders[msg.sender].amount > 0, "You don't have any order to receive.");
         orders[msg.sender].received = true;
         _burn(msg.sender, clothingId, amount);
+        lastUpdate = block.timestamp;
     }
 
     function isEmpty(string memory str) private pure returns (bool) {
-        //bytes memory tempStr = bytes(str);
         return (bytes(str).length == 0);
     }
 

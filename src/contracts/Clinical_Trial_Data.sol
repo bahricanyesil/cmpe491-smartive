@@ -1177,16 +1177,16 @@ contract ClinicalTrialData is ERC1155, Ownable, AccessControl {
     }
     
     struct Doctor {
-        string name;
         address doctorAddress;
         uint256 enteredDataNumber;
         uint256 soldDataNumber;
+        string name;
     }
 
     struct ClinicalDataCenter {
+        address addressInfo;
         string name;
         uint256 workerCapacity;
-        address addressInfo;
     }
 
     mapping(uint256 => PatientOverview) patientOverviews;

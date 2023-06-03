@@ -1512,7 +1512,7 @@ contract TimeSlots is ERC721, Pausable, Ownable {
     Counters.Counter private _timeSlotIdCounter;
 
     address Owner;
-    struct TimeSlot {
+    struct timeSlot {
         uint256 timeSlotId;
         uint256 price;
         uint256 startTime;
@@ -1527,20 +1527,15 @@ contract TimeSlots is ERC721, Pausable, Ownable {
     }
 
     Event public EventDetails;
-    mapping (uint256 => TimeSlot) public timeSlots;
+    mapping (uint256 => timeSlot) public timeSlots;
 
-    constructor (string memory _eventName, uint256 _eventStartTime, uint256 _eventEndTime, uint256 _interval ) 
-    ERC721("TimeSlotToken", "TST")
+    constructor ( ) ERC721("","")
     {
-        require(_eventStartTime > block.timestamp, "You can not set start time of event to a past date.");
-        require( _eventEndTime > block.timestamp, "You can not set end time of event to a past date.");
-        require(_eventStartTime < _eventEndTime , "You should set end time of event according to start time of event.");
-        require(!isEmpty(_eventName), "Event name must be entered.");
+        EventDetails.eventName = "";
+        EventDetails.eventStartTime = block.timestamp;
+        EventDetails.eventEndTime = 0;
+        EventDetails.interval = 0;
         Owner = msg.sender;
-        EventDetails.eventName = _eventName;
-        EventDetails.eventStartTime = _eventStartTime;
-        EventDetails.eventEndTime = _eventEndTime;
-        EventDetails.interval = _interval;
 
     }
 
@@ -1569,13 +1564,16 @@ contract TimeSlots is ERC721, Pausable, Ownable {
         
     }
 
-    function checkEventPassed() private returns (bool) {
+
+   function checkEventPassed() private returns (bool) {
         if(block.timestamp >= EventDetails.eventStartTime) {
             _pause();
             return true;
         }
         return false;
     }
+
+
 
     function withdraw() public onlyOwner {
         require(address(this).balance > 0, "Balance is 0.");
