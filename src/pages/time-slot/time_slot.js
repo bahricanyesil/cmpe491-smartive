@@ -1,8 +1,6 @@
 import Box from "@mui/material/Box";
-import FormGroup from "@mui/material/FormGroup";
 import TextField from "@mui/material/TextField";
 import React, { useEffect, useState } from 'react';
-import CustomCheckbox from "../../components/checkbox/custom_checkbox";
 import SourceCodeView from '../../components/source-code-view/source_code_view';
 
 import TimeSlotContract from '../../contracts/timeSlot.sol';
@@ -110,12 +108,6 @@ const TimeSlot = () => {
 
 
   return (
-<<<<<<< HEAD
-    <div style={{ display: 'flex', height: '100%', direction: 'ltr' }}>
-      <main>
-        <div style={{ padding: '16px 24px', color: '#44596e' }}>
-       {contractCode ? <SourceCodeView key={contractCode} contractName={"Time Slots Contract Code Editor"} contractCode={contractCode}/> : <p>Loading...</p>}
-=======
     <div style={{ display: "flex", height: "100%", direction: "ltr" }}>
       <div style={{ padding: "16px 24px", width: "77%", color: "#44596e" }}>
         {contractCode ? (
@@ -158,7 +150,6 @@ const TimeSlot = () => {
               />
             </div>
           </Box>
->>>>>>> 78c09e94051cc41e16aa9d9d8a83dee62aba3fdb
         </div>
 
         <div style={{ padding: "5px 24px", color: "#44596e" }}>
