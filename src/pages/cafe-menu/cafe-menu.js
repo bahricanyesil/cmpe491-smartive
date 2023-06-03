@@ -8,6 +8,7 @@ import SourceCodeView from "../../components/source-code-view/source_code_view";
 
 import cafeMenuContract from "../../contracts/Cafe_Menu.sol";
 
+
 const CafeMenu = () => {
   const [contractCode, setContractCode] = useState(null);
   const [contractName, setContractName] = useState("CafeMenu");
@@ -82,7 +83,7 @@ const CafeMenu = () => {
   useEffect(() => {
     fetch(cafeMenuContract)
       .then((r) => r.text())
-      .then((text) => {
+      .then(async (text) => {
         setContractCode(text);
         const allLines = text.split("\n");
         setBeforeLines([
@@ -277,7 +278,10 @@ const CafeMenu = () => {
         let addNewItemFunc = `    function addNewMenuItem(uint256 price, uint8 itemType, uint256 initialAmount`;
         for (let j = 0; j < newMenuItemProperties.length; j++) {
           if (!newMenuItemPropertiesCheck[j]) continue;
-          if (newMenuItemPropertiesTypes[j].includes("string") || newMenuItemPropertiesTypes[j].includes("[]")) {
+          if (
+            newMenuItemPropertiesTypes[j].includes("string") ||
+            newMenuItemPropertiesTypes[j].includes("[]")
+          ) {
             addNewItemFunc += `, ${newMenuItemPropertiesTypes[j]} memory ${newMenuItemProperties[j]}`;
           } else {
             addNewItemFunc += `, ${newMenuItemPropertiesTypes[j]} ${newMenuItemProperties[j]}`;
@@ -322,7 +326,10 @@ const CafeMenu = () => {
         let addNewItemFunc = `    function updateItemData(uint256 itemId, uint256 price, uint8 itemType`;
         for (let j = 0; j < newMenuItemProperties.length; j++) {
           if (!newMenuItemPropertiesCheck[j]) continue;
-          if (newMenuItemPropertiesTypes[j].includes("string") || newMenuItemPropertiesTypes[j].includes("[]")) {
+          if (
+            newMenuItemPropertiesTypes[j].includes("string") ||
+            newMenuItemPropertiesTypes[j].includes("[]")
+          ) {
             addNewItemFunc += `, ${newMenuItemPropertiesTypes[j]} memory ${newMenuItemProperties[j]}`;
           } else {
             addNewItemFunc += `, ${newMenuItemPropertiesTypes[j]} ${newMenuItemProperties[j]}`;

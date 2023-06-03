@@ -1,12 +1,11 @@
 import React from 'react';
 
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
 import Header from './components/header/header';
 import AboutPage from './pages/about/about';
 import CafeMenu from './pages/cafe-menu/cafe-menu';
 import ClinicalTrialData from './pages/clinical-trial-data/clinical_trial_data';
 import Clothing from './pages/clothing/clothing';
-// import CompileContract from './pages/compile-contract/compile_contract_page';
 import GameObjects from './pages/game-objects/game_objects';
 import HomePage from './pages/home-page/home_page';
 import Insurance from './pages/insurance/insurance';
