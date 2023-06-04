@@ -1205,14 +1205,14 @@ contract ClinicalTrialData is ERC1155, Ownable, AccessControl {
 
     function addDoctor(string memory name, address doctorAddress) public onlyOwner {
         require(doctors[msg.sender].doctorAddress == address(0));
-        doctors[doctorAddress] = Doctor(name, doctorAddress, 0, 0);
+        doctors[doctorAddress] = Doctor(doctorAddress, 0, 0, name);
         _grantRole(DOCTOR_ROLE, doctorAddress);
         doctorList.push(doctorAddress);
     }
 
     function addDataCenter(string memory name, uint256 workerCapacity, address dataCenterAddress) public onlyOwner {
         require(dataCenters[msg.sender].addressInfo == address(0));
-        dataCenters[dataCenterAddress] = ClinicalDataCenter(name, workerCapacity, dataCenterAddress);
+        dataCenters[dataCenterAddress] = ClinicalDataCenter(dataCenterAddress, name, workerCapacity);
         _grantRole(DATA_CENTER_ROLE, dataCenterAddress);
         dataCenterList.push(dataCenterAddress);
     }
