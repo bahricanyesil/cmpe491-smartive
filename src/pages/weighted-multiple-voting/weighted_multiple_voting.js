@@ -105,7 +105,10 @@ const WeightedMultipleVoting = () => {
         }
         for (let j = 0; j < newCategoryItems.length; j++) {
           if (!newCheckedCategoryItems[j]) continue;
-          if (newCategoryItemTypes[j].includes("string") || newCategoryItemTypes[j].includes("[]")) {
+          if (
+            newCategoryItemTypes[j].includes("string") ||
+            newCategoryItemTypes[j].includes("[]")
+          ) {
             constructorText +=
               ", " +
               newCategoryItemTypes[j] +
@@ -141,7 +144,10 @@ const WeightedMultipleVoting = () => {
           "    function addVoter(address voterAddress, uint256 weight";
         for (let j = 0; j < newCategoryItems.length; j++) {
           if (!newCheckedCategoryItems[j]) continue;
-          if (newCategoryItemTypes[j].includes("string") || newCategoryItemTypes[j].includes("[]")) {
+          if (
+            newCategoryItemTypes[j].includes("string") ||
+            newCategoryItemTypes[j].includes("[]")
+          ) {
             addVoterFunc +=
               ", " + newCategoryItemTypes[j] + " memory " + newCategoryItems[j];
           } else {
@@ -431,6 +437,7 @@ const WeightedMultipleVoting = () => {
   for (let i = 0; i < eventDetailItems.length; i++) {
     eventCheckboxViews.push(
       <CustomCheckbox
+        key={eventDetailItems[i] + " - " + eventDetailItemTypes[i]}
         label={eventDetailItems[i] + " - " + eventDetailItemTypes[i]}
         onChange={(event) => checkEventDetailItem(event.target.checked, i)}
       />
@@ -441,6 +448,7 @@ const WeightedMultipleVoting = () => {
   for (let i = 0; i < categoryItems.length; i++) {
     categoryCheckboxViews.push(
       <CustomCheckbox
+        key={categoryItems[i] + " - " + categoryItemTypes[i]}
         label={categoryItems[i] + " - " + categoryItemTypes[i]}
         onChange={(event) => checkCategoryItem(event.target.checked, i)}
       />
