@@ -36,7 +36,7 @@ const Insurance = () => {
         const allLines = text.split("\n");
         setBeforeLines([
           allLines.slice(0, 6 - 5),
-          allLines.slice(7 - 5, 28 - 5),
+          allLines.slice(7 - 5, 27 - 5),
           allLines.slice(36 - 5, 97 - 5),
         ]);
       });
@@ -105,12 +105,20 @@ const Insurance = () => {
         newLines.push(`contract ${newContractName} is ERC20, Ownable {`);
       } else if (i === 1) {
         newLines.push(...beforeLines[i]);
-        newLines.push(`    constructor ( ) ERC20( "${newContractURI}" , "${newTokenSymbol}") {`);
-        newLines.push(`        firstTokenSetPrice = ${newTokenPrice};`);
-        newLines.push(`        wallet = "${newWalletAddress}";`);
-        newLines.push(`        extraTokenPrice = ${newExtraTokenPrice};`);
-        newLines.push(`        firstTokenSetAmount =  ${newTokenAmount};`);
-        newLines.push(`        _mint(msg.sender, ${newTotalAmount});`);
+        if (!newWalletAddress &&  !newContractURI && !newTokenSymbol && !newTokenPrice  && !newExtraTokenPrice && !newTokenAmount && !newTotalAmount ) {
+          newLines.push(`     (uint256 _firstTokenSetPrice, uint256 _extraTokenPrice, address payable _wallet, uint256 _totalSupply, uint256 _firstTokenSetAmount )
+          ERC20("InsuranceToken", "ISK") `);
+        }
+        else {
+          newLines.push(`     constructor() `);
+          newLines.push(`     ERC20( "${newContractURI}" , "${newTokenSymbol}") {`);
+          newLines.push(`        firstTokenSetPrice = ${newTokenPrice};`);
+          newLines.push(`        wallet = payable(address(bytes20(bytes("${newWalletAddress}"))));`);
+          newLines.push(`        extraTokenPrice = ${newExtraTokenPrice};`);
+          newLines.push(`        firstTokenSetAmount =  ${newTokenAmount};`);
+          newLines.push(`        _mint(msg.sender, ${newTotalAmount});`);
+        }
+        
       } else if (i === 2) {
         newLines.push(...beforeLines[i]);
       } 

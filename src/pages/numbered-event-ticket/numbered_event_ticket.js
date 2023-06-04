@@ -100,7 +100,7 @@ const NumberedEventTicket = () => {
         for (let j = 0; j < newEventDetailItems.length; j++) {
           if (!newCheckedEventDetailItems[j]) continue;
           newLines.push(
-            `        ${eventDetailItemTypes[j]} ${eventDetailItems[j]};`
+            `        ${newEventDetailItemTypes[j]} ${newEventDetailItems[j]};`
           );
         }
       } else if (i === 3) {
@@ -117,7 +117,7 @@ const NumberedEventTicket = () => {
           }
         }
         constructorText = constructorText.slice(0, constructorText.length - 2);
-        constructorText += `) ERC721("${targetURIParam}") {`;
+        constructorText += `) ERC721("${targetURIParam}", "${targetURIParam.substring(0,2)}") {`;
         newLines.push(constructorText);
         if (newCheckedEventDetailItems[0])
           newLines.push(
@@ -164,7 +164,7 @@ const NumberedEventTicket = () => {
         if (newCheckedCategoryItems[0]) {
           newLines.push("        for(uint256 i=0; i<supplies.length; i++) {");
           newLines.push(
-            '            require(!compareStrings(categories[i].name, name), "There is already a category with the same name.");'
+            '            require(!compareStrings(seatBlocks[i].name, name), "There is already a category with the same name.");'
           );
           newLines.push("        }");
         }

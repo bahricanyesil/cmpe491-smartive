@@ -99,6 +99,7 @@ const ClinicalTrialData = () => {
     for (let i = 0; i < beforeLines.length; i++) {
       newLines.push(...beforeLines[i]);
       if (i === 0) {
+        
         let contractText = `contract ${newContractName} is ERC1155, Ownable, AccessControl {`;
         newLines.push(contractText);
       } else if (i === 1) {
@@ -134,7 +135,7 @@ const ClinicalTrialData = () => {
         newLines.push(`        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);`);
         newLines.push(`    }`);
         newLines.push(``);
-        let addCateText = "    function addDoctor(address doctorAddress,";
+        let addCateText = "    function addDoctor(address doctorAddress";
         for (let j = 0; j < newCategoryItems.length; j++) {
           if (!newCheckedCategoryItems[j]) continue;
           let memoryText = "";
@@ -176,9 +177,9 @@ const ClinicalTrialData = () => {
           `        require(dataCenters[msg.sender].addressInfo == address(0), "Data center has already added.");`
         );
         let text = `        dataCenters[dataCenterAddress] = ClinicalDataCenter(dataCenterAddress`;
-        for (let j = 0; j < eventDetailItems.length; j++) {
+        for (let j = 0; j < newEventDetailItems.length; j++) {
           if (!newCheckedEventDetailItems[j]) continue;
-          text += `, ${eventDetailItems[j]}`;
+          text += `, ${newEventDetailItems[j]}`;
         }
         text += ");";
         newLines.push(text);
@@ -232,6 +233,7 @@ const ClinicalTrialData = () => {
         }
         text += "));";
         newLines.push(text);
+        newLines.push("    }");
       }
     }
     setContractCode(newLines.join("\n"));
