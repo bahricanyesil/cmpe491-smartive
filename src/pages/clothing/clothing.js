@@ -10,6 +10,7 @@ import clothingContract from '../../contracts/Clothing.sol';
 
 const Clothing = () => {
   const [contractCode, setContractCode] = useState(null);
+  const [completeContractCode, setCompleteContractCode] = useState("");
   const [contractName, setContractName] = useState("Clothing");
   const [newClothingType, setNewClothingType] = useState("");
   const [newClothingSize, setNewClothingSize] = useState("");
@@ -143,16 +144,19 @@ const Clothing = () => {
     fetch(clothingContract)
       .then((r) => r.text())
       .then((text) => {
+        setCompleteContractCode(text);
+        const startIndex = text.indexOf("contract Clothing");
+        text = text.substring(startIndex - 1);
         setContractCode(text);
         const allLines = text.split("\n");
         setBeforeLines([
-          allLines.slice(0, 8),
-          allLines.slice(9, 12),
-          allLines.slice(15, 23),
-          allLines.slice(25, 39),
-          allLines.slice(40, 43),
-          allLines.slice(56, 88),
-          allLines.slice(106),
+          allLines.slice(0, 8 - 7),
+          allLines.slice(9 - 7, 12 - 7),
+          allLines.slice(15 - 7, 23 - 7),
+          allLines.slice(25 - 7, 39 - 7),
+          allLines.slice(40 - 7, 43 - 7),
+          allLines.slice(56 - 7, 88 - 7),
+          allLines.slice(106 - 7),
         ]);
       });
   }, []);
@@ -201,8 +205,11 @@ const Clothing = () => {
   };
 
   const targetNameChange = (event) => {
-    setContractName(event.target.value);
-    setNewContract({newContractName: event.target.value});
+    const inputValue = event.target.value;
+    if (isNaN(inputValue)) {
+      setContractName(inputValue);
+      setNewContract({newContractName: event.target.value});
+    }
   };
 
   const targetURIChange = (event) => {
@@ -563,8 +570,9 @@ const Clothing = () => {
         {contractCode ? (
           <SourceCodeView
             key={contractCode}
-            contractName={"Clothing Contract Code Editor"}
+            contractName={"Clothing"}
             contractCode={contractCode}
+            completeContract={completeContractCode}
           />
         ) : (
           <p>Loading...</p>

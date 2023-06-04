@@ -10,7 +10,8 @@ import gameObjectContract from '../../contracts/game_objects.sol';
 
 const GameObjects = () => {
   const [contractCode, setContractCode] = useState(null);
-  const [contractName, setContractName] = useState("Game Objects");
+  const [completeContractCode, setCompleteContractCode] = useState("");
+  const [contractName, setContractName] = useState("GameObjects");
   const [newGameObjectType, setNewGameObjectType] = useState("");
   const [newGameObjectRareness, setNewGameObjectRareness] = useState("");
   const [newGameObjectProperty, setNewGameObjectProperty] = useState("");
@@ -66,16 +67,19 @@ const GameObjects = () => {
     fetch(gameObjectContract)
       .then((r) => r.text())
       .then((text) => {
+        setCompleteContractCode(text);
+        const startIndex = text.indexOf("contract GameObjects");
+        text = text.substring(startIndex - 1);
         setContractCode(text);
         const allLines = text.split("\n");
         setBeforeLines([
-          allLines.slice(0, 8),
-          allLines.slice(9, 12),
-          allLines.slice(14, 21),
-          allLines.slice(23, 37),
-          allLines.slice(38, 41),
-          allLines.slice(53, 85),
-          allLines.slice(101),
+          allLines.slice(0, 8 - 7),
+          allLines.slice(9 - 7, 12 - 7),
+          allLines.slice(14 - 7, 21 - 7),
+          allLines.slice(23 - 7, 37 - 7),
+          allLines.slice(38 - 7, 41 - 7),
+          allLines.slice(53 - 7, 85 - 7),
+          allLines.slice(101 - 7),
         ]);
       });
   }, []);
@@ -113,8 +117,11 @@ const GameObjects = () => {
   };
 
   const targetNameChange = (event) => {
-    setContractName(event.target.value);
-    setNewContract({newContractName: event.target.value});
+    const inputValue = event.target.value;
+    if (isNaN(inputValue)) {
+      setContractName(inputValue);
+      setNewContract({newContractName: event.target.value});
+    }
   };
 
   const targetURIChange = (event) => {
@@ -263,7 +270,7 @@ const GameObjects = () => {
 
     let newLines = [];
 
-    let gameObjectTypeLine = "    enum ItemType {";
+    let gameObjectTypeLine = "    enum ItemType { ";
     let lastGameObjectType = "";
     let addComma = false;
     for (let i = 0; i < newGameObjectTypesSelected.length; i++) {
@@ -277,7 +284,7 @@ const GameObjects = () => {
     gameObjectTypeLine += "}";
     const lastGameObjectTypeLine = `        require(itemType <= uint8(ItemType.${lastGameObjectType}), "Type of game item is out of range");`;
     
-    let gameObjectRarenessLine = "    enum Rareness {";
+    let gameObjectRarenessLine = "    enum Rareness { ";
     let lastGameObjectRareness = "";
     addComma = false;
     for (let i = 0; i < newGameObjectRarenessesSelected.length; i++) {
@@ -428,8 +435,9 @@ const GameObjects = () => {
         {contractCode ? (
           <SourceCodeView
             key={contractCode}
-            contractName={"Game Objects Contract Code Editor"}
+            contractName={"GameObjects"}
             contractCode={contractCode}
+            completeContract={completeContractCode}
           />
         ) : (
           <p>Loading...</p>
@@ -461,7 +469,7 @@ const GameObjects = () => {
                 onChange={targetNameChange}
                 id="outlined-required"
                 label="Required"
-                defaultValue="Game Objects"
+                defaultValue="GameObjects"
               />
             </div>
           </Box>

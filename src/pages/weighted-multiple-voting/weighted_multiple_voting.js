@@ -10,6 +10,7 @@ import WeightedMultipleVotingContract from "../../contracts/Weighted_Multiple_Vo
 
 const WeightedMultipleVoting = () => {
   const [contractCode, setContractCode] = useState(null);
+  const [completeContractCode, setCompleteContractCode] = useState("");
   const [contractName, setContractName] = useState("WeightedMultipleVoting");
   const [tokenName, setTokenName] = useState("WeightedToken");
   const [tokenSymbol, setTokenSymbol] = useState("WeTo");
@@ -35,19 +36,22 @@ const WeightedMultipleVoting = () => {
     fetch(WeightedMultipleVotingContract)
       .then((r) => r.text())
       .then((text) => {
+        setCompleteContractCode(text);
+        const startIndex = text.indexOf("contract WeightedMultipleVoting");
+        text = text.substring(startIndex - 1);
         setContractCode(text);
         const allLines = text.split("\n");
         setBeforeLines([
-          allLines.slice(0, 9),
-          allLines.slice(10, 13),
-          allLines.slice(14, 20),
-          allLines.slice(21, 29),
-          allLines.slice(31, 33),
-          allLines.slice(34, 39),
-          allLines.slice(40, 53),
-          allLines.slice(54, 60),
-          allLines.slice(61, 126),
-          allLines.slice(140),
+          allLines.slice(0, 9 - 8),
+          allLines.slice(10 - 8, 13 - 8),
+          allLines.slice(14 - 8, 20 - 8),
+          allLines.slice(21 - 8, 29 - 8),
+          allLines.slice(31 - 8, 33 - 8),
+          allLines.slice(34 - 8, 39 - 8),
+          allLines.slice(40 - 8, 53 - 8),
+          allLines.slice(54 - 8, 60 - 8),
+          allLines.slice(61 - 8, 126 - 8),
+          allLines.slice(140 - 8),
         ]);
       });
   }, []);
@@ -196,8 +200,11 @@ const WeightedMultipleVoting = () => {
   };
 
   const targetNameChange = (event) => {
-    setContractName(event.target.value);
-    setNewContract(event.target.value, tokenName);
+    const inputValue = event.target.value;
+    if (isNaN(inputValue)) {
+      setContractName(inputValue);
+      setNewContract(event.target.value, tokenName);
+    }
   };
 
   const targetTokenNameChange = (event) => {
@@ -446,8 +453,9 @@ const WeightedMultipleVoting = () => {
         {contractCode ? (
           <SourceCodeView
             key={contractCode}
-            contractName={"Weighted Multiple Voting Contract Code Editor"}
+            contractName={"WeightedMultipleVoting"}
             contractCode={contractCode}
+            completeContract={completeContractCode}
           />
         ) : (
           <p>Loading...</p>

@@ -8,9 +8,9 @@ import SourceCodeView from "../../components/source-code-view/source_code_view";
 
 import cafeMenuContract from "../../contracts/Cafe_Menu.sol";
 
-
 const CafeMenu = () => {
   const [contractCode, setContractCode] = useState(null);
+  const [completeContractCode, setCompleteContractCode] = useState("");
   const [contractName, setContractName] = useState("CafeMenu");
   const [newMenuItem, setNewMenuItem] = useState("");
   const [newMenuItemProperty, setNewMenuItemProperty] = useState("");
@@ -84,16 +84,19 @@ const CafeMenu = () => {
     fetch(cafeMenuContract)
       .then((r) => r.text())
       .then(async (text) => {
+        setCompleteContractCode(text);
+        const startIndex = text.indexOf("contract CafeMenu");
+        text = text.substring(startIndex - 1);
         setContractCode(text);
         const allLines = text.split("\n");
         setBeforeLines([
-          allLines.slice(0, 8),
-          allLines.slice(9, 12),
-          allLines.slice(13, 19),
-          allLines.slice(23, 37),
-          allLines.slice(38, 41),
-          allLines.slice(53, 85),
-          allLines.slice(102),
+          allLines.slice(0, 8 - 7),
+          allLines.slice(9 - 7, 12 - 7),
+          allLines.slice(13 - 7, 19 - 7),
+          allLines.slice(23 - 7, 37 - 7),
+          allLines.slice(38 - 7, 41 - 7),
+          allLines.slice(53 - 7, 85 - 7),
+          allLines.slice(102 - 7),
         ]);
       });
   }, []);
@@ -128,8 +131,11 @@ const CafeMenu = () => {
   };
 
   const targetNameChange = (event) => {
-    setContractName(event.target.value);
-    setNewContract(event.target.value, contractURI, menuItems);
+    const inputValue = event.target.value;
+    if (isNaN(inputValue)) {
+      setContractName(inputValue);
+      setNewContract(inputValue, contractURI, menuItems);
+    }
   };
 
   const targetURIChange = (event) => {
@@ -408,8 +414,9 @@ const CafeMenu = () => {
         {contractCode ? (
           <SourceCodeView
             key={contractCode}
-            contractName={"Cafe Menu Contract Code Editor"}
+            contractName={"CafeMenu"}
             contractCode={contractCode}
+            completeContract={completeContractCode}
           />
         ) : (
           <p>Loading...</p>

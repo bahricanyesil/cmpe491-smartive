@@ -7,7 +7,8 @@ import TimeSlotContract from '../../contracts/timeSlot.sol';
 
 const TimeSlot = () => {
   const [contractCode, setContractCode] = useState(null);
-  const [contractName, setContractName] = useState("TimeSlot");
+  const [completeContractCode, setCompleteContractCode] = useState("");
+  const [contractName, setContractName] = useState("TimeSlots");
   const [contractURI, setContractURI] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
   const [eventName, setEventName] = useState("");
@@ -16,33 +17,29 @@ const TimeSlot = () => {
   const [beforeLines, setBeforeLines] = useState([]);
   const [interval, setInterval] = useState("");
 
-
   useEffect(() => {
     fetch(TimeSlotContract)
       .then((r) => r.text())
       .then((text) => {
+        setCompleteContractCode(text);
+        const startIndex = text.indexOf("contract TimeSlots");
+        text = text.substring(startIndex - 1);
         setContractCode(text);
         const allLines = text.split("\n");
         setBeforeLines([
-          allLines.slice(0, 9),
-          allLines.slice(10, 32),
-          allLines.slice(38, 88),
+          allLines.slice(0, 9 - 8),
+          allLines.slice(10 - 8, 32 - 8),
+          allLines.slice(38 - 8, 88 - 8),
         ]);
       });
   }, []);
   
-
-  useEffect(() => {
-    fetch(TimeSlotContract)
-      .then(r => r.text())
-      .then(text => {
-        setContractCode(text);
-  });
-  }, []);
-
   const targetNameChange = (event) => {
-    setContractName(event.target.value);
-    setNewContract(event.target.value);                         // CONTRACT CREATION
+    const inputValue = event.target.value;
+    if (isNaN(inputValue)) {
+      setContractName(inputValue);
+      setNewContract(event.target.value);
+    }
   };
 
   const targetURIChange = (event) => {
@@ -106,15 +103,15 @@ const TimeSlot = () => {
     setContractCode(newLines.join("\n"));
   };
 
-
   return (
     <div style={{ display: "flex", height: "100%", direction: "ltr" }}>
       <div style={{ padding: "16px 24px", width: "77%", color: "#44596e" }}>
         {contractCode ? (
           <SourceCodeView
             key={contractCode}
-            contractName={"Time Slot Contract Code Editor"}
+            contractName={"TimeSlots"}
             contractCode={contractCode}
+            completeContract={completeContractCode}
           />
         ) : (
           <p>Loading...</p>
@@ -146,7 +143,7 @@ const TimeSlot = () => {
                 onChange={targetNameChange}
                 id="outlined-required"
                 label="Required"
-                defaultValue="TimeSlot"
+                defaultValue="TimeSlots"
               />
             </div>
           </Box>

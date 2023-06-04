@@ -10,6 +10,7 @@ import UnNumberedEventTicketContract from "../../contracts/UnNumbered_Ticket.sol
 
 const UnNumberedEventTicket = () => {
   const [contractCode, setContractCode] = useState(null);
+  const [completeContractCode, setCompleteContractCode] = useState("");
   const [contractName, setContractName] = useState("UnNumberedTicket");
   const [contractURI, setContractURI] = useState("");
   const [beforeLines, setBeforeLines] = useState([]);
@@ -48,21 +49,24 @@ const UnNumberedEventTicket = () => {
     fetch(UnNumberedEventTicketContract)
       .then((r) => r.text())
       .then((text) => {
+        setCompleteContractCode(text);
+        const startIndex = text.indexOf("contract UnNumberedEventTicket");
+        text = text.substring(startIndex - 1);
         setContractCode(text);
         const allLines = text.split("\n");
         setBeforeLines([
-          allLines.slice(0, 10),
-          allLines.slice(11, 19),
-          allLines.slice(20, 23),
-          allLines.slice(28, 35),
-          allLines.slice(44, 55),
-          allLines.slice(57, 59),
-          allLines.slice(62, 64),
-          allLines.slice(65, 71),
-          allLines.slice(72, 84),
-          allLines.slice(91, 94),
-          allLines.slice(95, 96),
-          allLines.slice(97),
+          allLines.slice(0, 10 - 9),
+          allLines.slice(11 - 9, 19 - 9),
+          allLines.slice(20 - 9, 23 - 9),
+          allLines.slice(28 - 9, 35 - 9),
+          allLines.slice(44 - 9, 55 - 9),
+          allLines.slice(57 - 9, 59 - 9),
+          allLines.slice(62 - 9, 64 - 9),
+          allLines.slice(65 - 9, 71 - 9),
+          allLines.slice(72 - 9, 84 - 9),
+          allLines.slice(91 - 9, 94 - 9),
+          allLines.slice(95 - 9, 96 - 9),
+          allLines.slice(97 - 9),
         ]);
       });
   }, []);
@@ -194,10 +198,13 @@ const UnNumberedEventTicket = () => {
   };
 
   const targetNameChange = (event) => {
-    setContractName(event.target.value);
-    setNewContract(event.target.value, contractURI);
+    const inputValue = event.target.value;
+    if (isNaN(inputValue)) {
+      setContractName(inputValue);
+      setNewContract(event.target.value, contractURI);
+    }
   };
-
+  
   const targetURIChange = (event) => {
     setContractURI(event.target.value);
     setNewContract(contractName, event.target.value);
@@ -397,8 +404,9 @@ const UnNumberedEventTicket = () => {
         {contractCode ? (
           <SourceCodeView
             key={contractCode}
-            contractName={"UnNumbered Event Ticket Contract Code Editor"}
+            contractName={"UnNumberedEventTicket"}
             contractCode={contractCode}
+            completeContract={completeContractCode}
           />
         ) : (
           <p>Loading...</p>

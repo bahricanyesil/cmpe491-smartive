@@ -10,6 +10,7 @@ import NumberedEventTicketContract from "../../contracts/Numbered_Event_Ticket.s
 
 const NumberedEventTicket = () => {
   const [contractCode, setContractCode] = useState(null);
+  const [completeContractCode, setCompleteContractCode] = useState("");
   const [contractName, setContractName] = useState("NumberedTicket");
   const [contractURI, setContractURI] = useState("");
   const [beforeLines, setBeforeLines] = useState([]);
@@ -48,21 +49,24 @@ const NumberedEventTicket = () => {
     fetch(NumberedEventTicketContract)
       .then((r) => r.text())
       .then((text) => {
+        setCompleteContractCode(text);
+        const startIndex = text.indexOf("contract NumberedEventTicket");
+        text = text.substring(startIndex - 1);
         setContractCode(text);
         const allLines = text.split("\n");
         setBeforeLines([
-          allLines.slice(0, 9),
-          allLines.slice(10, 30),
-          allLines.slice(31, 34),
-          allLines.slice(39, 46),
-          allLines.slice(55, 79),
-          allLines.slice(81, 83),
-          allLines.slice(86, 91),
-          allLines.slice(92, 99),
-          allLines.slice(100, 140),
-          allLines.slice(147, 150),
-          allLines.slice(151, 152),
-          allLines.slice(153),
+          allLines.slice(0, 9 - 8),
+          allLines.slice(10 - 8, 30 - 8),
+          allLines.slice(31 - 8, 34 - 8),
+          allLines.slice(39 - 8, 46 - 8),
+          allLines.slice(55 - 8, 79 - 8),
+          allLines.slice(81 - 8, 83 - 8),
+          allLines.slice(86 - 8, 91 - 8),
+          allLines.slice(92 - 8, 99 - 8),
+          allLines.slice(100 - 8, 140 - 8),
+          allLines.slice(147 - 8, 150 - 8),
+          allLines.slice(151 - 8, 152 - 8),
+          allLines.slice(153 - 8),
         ]);
       });
   }, []);
@@ -92,16 +96,21 @@ const NumberedEventTicket = () => {
             `        ${newCategoryItemTypes[j]} ${newCategoryItems[j]};`
           );
         }
-      }else if(i===2) {
+      } else if (i === 2) {
         for (let j = 0; j < newEventDetailItems.length; j++) {
           if (!newCheckedEventDetailItems[j]) continue;
-          newLines.push(`        ${eventDetailItemTypes[j]} ${eventDetailItems[j]};`);
+          newLines.push(
+            `        ${eventDetailItemTypes[j]} ${eventDetailItems[j]};`
+          );
         }
-      }  else if (i === 3) {
+      } else if (i === 3) {
         let constructorText = "    constructor(";
         for (let j = 0; j < newEventDetailItems.length; j++) {
           if (!newCheckedEventDetailItems[j]) continue;
-          if (newEventDetailItemTypes[j].includes("string") || newEventDetailItemTypes[j].includes("[]")) {
+          if (
+            newEventDetailItemTypes[j].includes("string") ||
+            newEventDetailItemTypes[j].includes("[]")
+          ) {
             constructorText += `${newEventDetailItemTypes[j]} memory ${newEventDetailItems[j]}_, `;
           } else {
             constructorText += `${newEventDetailItemTypes[j]} ${newEventDetailItems[j]}_, `;
@@ -132,13 +141,17 @@ const NumberedEventTicket = () => {
             lastEl.slice(0, lastEl.length - 1),
           ];
         }
-      }else if (i === 4) {
+      } else if (i === 4) {
         let addCateText =
           "    function addBlock(uint256 price, uint256 totalRowNumber_";
         for (let j = 0; j < newCategoryItems.length; j++) {
           if (!newCheckedCategoryItems[j]) continue;
           let memoryText = "";
-          if(newCategoryItemTypes[j].includes("string") || newCategoryItemTypes[j].includes("[]")) memoryText = "memory ";
+          if (
+            newCategoryItemTypes[j].includes("string") ||
+            newCategoryItemTypes[j].includes("[]")
+          )
+            memoryText = "memory ";
           addCateText += `, ${newCategoryItemTypes[j]} ${memoryText}${newCategoryItems[j]}`;
         }
         addCateText += ") public onlyOwner {";
@@ -148,18 +161,20 @@ const NumberedEventTicket = () => {
             '        require(!checkEventPassed(), "Event has already occurred.");'
           );
       } else if (i === 5) {
-        if(newCheckedCategoryItems[0]) {
+        if (newCheckedCategoryItems[0]) {
           newLines.push("        for(uint256 i=0; i<supplies.length; i++) {");
-          newLines.push('            require(!compareStrings(categories[i].name, name), "There is already a category with the same name.");');
+          newLines.push(
+            '            require(!compareStrings(categories[i].name, name), "There is already a category with the same name.");'
+          );
           newLines.push("        }");
         }
       } else if (i === 6) {
-        
-        for(let j=0; j<newCategoryItems.length; j++) {
-          if(!newCheckedCategoryItems[j]) continue;
-          newLines.push(`        newSeatBlock.${newCategoryItems[j]} = ${newCategoryItems[j]};`);
+        for (let j = 0; j < newCategoryItems.length; j++) {
+          if (!newCheckedCategoryItems[j]) continue;
+          newLines.push(
+            `        newSeatBlock.${newCategoryItems[j]} = ${newCategoryItems[j]};`
+          );
         }
-        
       } else if (i === 7) {
         if (newCheckedEventDetailItems[0])
           newLines.push(
@@ -193,8 +208,11 @@ const NumberedEventTicket = () => {
   };
 
   const targetNameChange = (event) => {
-    setContractName(event.target.value);
-    setNewContract(event.target.value, contractURI);
+    const inputValue = event.target.value;
+    if (isNaN(inputValue)) {
+      setContractName(inputValue);
+      setNewContract(event.target.value, contractURI);
+    }
   };
 
   const targetURIChange = (event) => {
@@ -247,7 +265,7 @@ const NumberedEventTicket = () => {
 
   const addNewEventDetail = (e) => {
     if (e.key != "Enter") return;
-    if(eventDetailItems.includes(newEventDetailName)) {
+    if (eventDetailItems.includes(newEventDetailName)) {
       alert("Please enter a unique name");
       return;
     }
@@ -308,7 +326,7 @@ const NumberedEventTicket = () => {
 
   const addNewCategoryItem = (e) => {
     if (e.key != "Enter") return;
-    if(categoryItems.includes(newCategoryItemName)) {
+    if (categoryItems.includes(newCategoryItemName)) {
       alert("Please enter a unique name");
       return;
     }
@@ -396,8 +414,9 @@ const NumberedEventTicket = () => {
         {contractCode ? (
           <SourceCodeView
             key={contractCode}
-            contractName={"Numbered Event Ticket Contract Code Editor"}
+            contractName={"NumberedEventTicket"}
             contractCode={contractCode}
+            completeContract={completeContractCode}
           />
         ) : (
           <p>Loading...</p>
@@ -464,34 +483,35 @@ const NumberedEventTicket = () => {
               Event Details
             </Divider>
             {eventCheckboxViews}
-          </FormGroup><Box
+          </FormGroup>
+          <Box
             component="form"
             sx={{
               "& .MuiTextField-root": { m: 1, width: "25ch" },
             }}
             noValidate
             autoComplete="off"
-          > 
-          <div>
-            <TextField
-              style={{ marginTop: "15px" }}
-              onChange={newEventDetailNameChange}
-              label="New Event Detail"
-              value={newEventDetailName}
-              defaultValue=""
-              onKeyDown={addNewEventDetail}
-            />
-          </div>
-          <div>
-            <TextField
-              style={{ marginTop: "15px" }}
-              onChange={newEventDetailTypeChange}
-              label="New Event Detail Type"
-              value={newEventDetailType}
-              defaultValue=""
-              onKeyDown={addNewEventDetail}
-            />
-          </div>
+          >
+            <div>
+              <TextField
+                style={{ marginTop: "15px" }}
+                onChange={newEventDetailNameChange}
+                label="New Event Detail"
+                value={newEventDetailName}
+                defaultValue=""
+                onKeyDown={addNewEventDetail}
+              />
+            </div>
+            <div>
+              <TextField
+                style={{ marginTop: "15px" }}
+                onChange={newEventDetailTypeChange}
+                label="New Event Detail Type"
+                value={newEventDetailType}
+                defaultValue=""
+                onKeyDown={addNewEventDetail}
+              />
+            </div>
           </Box>
           <FormGroup>
             <Divider
@@ -501,34 +521,36 @@ const NumberedEventTicket = () => {
               Block Feature
             </Divider>
             {categoryCheckboxViews}
-          </FormGroup><Box
+          </FormGroup>
+          <Box
             component="form"
             sx={{
               "& .MuiTextField-root": { m: 1, width: "25ch" },
             }}
             noValidate
             autoComplete="off"
-          > 
-          <div>
-            <TextField
-              style={{ marginTop: "15px" }}
-              onChange={newCategoryItemNameChange}
-              label="New Block Feature"
-              value={newCategoryItemName}
-              defaultValue=""
-              onKeyDown={addNewCategoryItem}
-            />
-          </div>
-          <div>
-            <TextField
-              style={{ marginTop: "15px" }}
-              onChange={newCategoryItemTypeChange}
-              label="New Block Feature Type"
-              value={newCategoryItemType}
-              defaultValue=""
-              onKeyDown={addNewCategoryItem}
-            />
-          </div></Box>
+          >
+            <div>
+              <TextField
+                style={{ marginTop: "15px" }}
+                onChange={newCategoryItemNameChange}
+                label="New Block Feature"
+                value={newCategoryItemName}
+                defaultValue=""
+                onKeyDown={addNewCategoryItem}
+              />
+            </div>
+            <div>
+              <TextField
+                style={{ marginTop: "15px" }}
+                onChange={newCategoryItemTypeChange}
+                label="New Block Feature Type"
+                value={newCategoryItemType}
+                defaultValue=""
+                onKeyDown={addNewCategoryItem}
+              />
+            </div>
+          </Box>
         </div>
       </div>
     </div>

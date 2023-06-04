@@ -10,6 +10,7 @@ import ClinicalTrialDataContract from "../../contracts/Clinical_Trial_Data.sol";
 
 const ClinicalTrialData = () => {
   const [contractCode, setContractCode] = useState(null);
+  const [completeContractCode, setCompleteContractCode] = useState("");
   const [contractName, setContractName] = useState("ClinicalTrialData");
   const [contractURI, setContractURI] = useState("");
   const [beforeLines, setBeforeLines] = useState([]);
@@ -26,12 +27,17 @@ const ClinicalTrialData = () => {
     true,
   ]);
   const [patientDetailItems, setPatientDetailItems] = React.useState([]);
-  const [checkedPatientDetailItems, setCheckedPatientDetailItems] = React.useState([]);
-  const [patientDetailItemTypes, setPatientDetailItemTypes] = React.useState([]);
+  const [checkedPatientDetailItems, setCheckedPatientDetailItems] =
+    React.useState([]);
+  const [patientDetailItemTypes, setPatientDetailItemTypes] = React.useState(
+    []
+  );
 
   const [labResultDetailItems, setLabResultDetailItems] = React.useState([]);
-  const [checkedLabResultDetailItems, setCheckedLabResultDetailItems] = React.useState([]);
-  const [labResultDetailItemTypes, setLabResultDetailItemTypes] = React.useState([]);
+  const [checkedLabResultDetailItems, setCheckedLabResultDetailItems] =
+    React.useState([]);
+  const [labResultDetailItemTypes, setLabResultDetailItemTypes] =
+    React.useState([]);
 
   const [newEventDetailName, setNewEventDetailName] = useState("");
   const [newEventDetailType, setNewEventDetailType] = useState("");
@@ -52,20 +58,23 @@ const ClinicalTrialData = () => {
     fetch(ClinicalTrialDataContract)
       .then((r) => r.text())
       .then((text) => {
+        setCompleteContractCode(text);
+        const startIndex = text.indexOf("contract ClinicalTrialData");
+        text = text.substring(startIndex - 1);
         setContractCode(text);
         const allLines = text.split("\n");
         setBeforeLines([
-          allLines.slice(0, 9),
-          allLines.slice(10, 32),
-          allLines.slice(32, 38),
-          allLines.slice(38, 44),
-          allLines.slice(45, 49),
-          allLines.slice(51, 63),
-          allLines.slice(70, 74),
-          allLines.slice(77, 81),
-          allLines.slice(82, 95),
-          allLines.slice(95, 100),
-          allLines.slice(105),
+          allLines.slice(0, 9 - 8),
+          allLines.slice(10 - 8, 32 - 8),
+          allLines.slice(32 - 8, 38 - 8),
+          allLines.slice(38 - 8, 44 - 8),
+          allLines.slice(45 - 8, 49 - 8),
+          allLines.slice(51 - 8, 63 - 8),
+          allLines.slice(70 - 8, 74 - 8),
+          allLines.slice(77 - 8, 81 - 8),
+          allLines.slice(82 - 8, 95 - 8),
+          allLines.slice(95 - 8, 100 - 8),
+          allLines.slice(105 - 8),
         ]);
       });
   }, []);
@@ -99,108 +108,132 @@ const ClinicalTrialData = () => {
             `        ${newPatientDetailItemTypes[j]} ${newPatientDetailItems[j]};`
           );
         }
-      }else if(i===2) {
+      } else if (i === 2) {
         for (let j = 0; j < newLabResultDetailItems.length; j++) {
           if (!newCheckedLabResultsDetailItems[j]) continue;
-          newLines.push(`        ${newLabResultDetailItemTypes[j]} ${newLabResultDetailItems[j]};`);
+          newLines.push(
+            `        ${newLabResultDetailItemTypes[j]} ${newLabResultDetailItems[j]};`
+          );
         }
-      }  else if (i === 3) {
+      } else if (i === 3) {
         for (let j = 0; j < newCategoryItems.length; j++) {
           if (!newCheckedCategoryItems[j]) continue;
-          newLines.push(`        ${newCategoryItemTypes[j]} ${newCategoryItems[j]};`);
+          newLines.push(
+            `        ${newCategoryItemTypes[j]} ${newCategoryItems[j]};`
+          );
         }
-        
-        
-        
-      }else if (i === 4) {
+      } else if (i === 4) {
         for (let j = 0; j < newEventDetailItems.length; j++) {
           if (!newCheckedEventDetailItems[j]) continue;
-          newLines.push(`        ${newEventDetailItemTypes[j]} ${newEventDetailItems[j]};`);
+          newLines.push(
+            `        ${newEventDetailItemTypes[j]} ${newEventDetailItems[j]};`
+          );
         }
       } else if (i === 5) {
         newLines.push(`    constructor() ERC1155("${targetURIParam}") {`);
         newLines.push(`        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);`);
         newLines.push(`    }`);
         newLines.push(``);
-        let addCateText =
-        "    function addDoctor(address doctorAddress,";
+        let addCateText = "    function addDoctor(address doctorAddress,";
         for (let j = 0; j < newCategoryItems.length; j++) {
           if (!newCheckedCategoryItems[j]) continue;
           let memoryText = "";
-          if(newCategoryItemTypes[j].includes("string") || newCategoryItemTypes[j].includes("[]")) memoryText = "memory ";
+          if (
+            newCategoryItemTypes[j].includes("string") ||
+            newCategoryItemTypes[j].includes("[]")
+          )
+            memoryText = "memory ";
           addCateText += `, ${newCategoryItemTypes[j]} ${memoryText}${newCategoryItems[j]}`;
         }
         addCateText += ") public onlyOwner {";
         newLines.push(addCateText);
-        newLines.push(`        require(doctors[msg.sender].doctorAddress == address(0), "Doctor has already added.");`);
+        newLines.push(
+          `        require(doctors[msg.sender].doctorAddress == address(0), "Doctor has already added.");`
+        );
         let text = `        doctors[doctorAddress] = Doctor(doctorAddress, 0, 0`;
         for (let j = 0; j < newCategoryItems.length; j++) {
           if (!newCheckedCategoryItems[j]) continue;
           text += `, ${newCategoryItems[j]}`;
-
         }
-        text += ");" ;
+        text += ");";
         newLines.push(text);
       } else if (i === 6) {
-        
         let addCateText =
-        "    function addDataCenter(address dataCenterAddress";
+          "    function addDataCenter(address dataCenterAddress";
         for (let j = 0; j < newEventDetailItems.length; j++) {
           if (!newCheckedEventDetailItems[j]) continue;
           let memoryText = "";
-          if(newEventDetailItemTypes[j].includes("string") || newEventDetailItemTypes[j].includes("[]")) memoryText = "memory ";
+          if (
+            newEventDetailItemTypes[j].includes("string") ||
+            newEventDetailItemTypes[j].includes("[]")
+          )
+            memoryText = "memory ";
           addCateText += `, ${newEventDetailItemTypes[j]} ${memoryText}${newEventDetailItems[j]}`;
         }
         addCateText += ") public onlyOwner {";
         newLines.push(addCateText);
-        newLines.push(`        require(dataCenters[msg.sender].addressInfo == address(0), "Data center has already added.");`);
+        newLines.push(
+          `        require(dataCenters[msg.sender].addressInfo == address(0), "Data center has already added.");`
+        );
         let text = `        dataCenters[dataCenterAddress] = ClinicalDataCenter(dataCenterAddress`;
         for (let j = 0; j < eventDetailItems.length; j++) {
           if (!newCheckedEventDetailItems[j]) continue;
           text += `, ${eventDetailItems[j]}`;
-
         }
-        text += ");" ;
+        text += ");";
         newLines.push(text);
       } else if (i === 7) {
         let addCateText =
-        "    function addPatient(uint256 age, uint8 genderIndex, string[] memory diseases, string[] memory drugs";
+          "    function addPatient(uint256 age, uint8 genderIndex, string[] memory diseases, string[] memory drugs";
         for (let j = 0; j < newPatientDetailItems.length; j++) {
           if (!newCheckedPatientDetailItems[j]) continue;
           let memoryText = "";
-          if(newPatientDetailItemTypes[j].includes("string") || newPatientDetailItemTypes[j].includes("[]")) memoryText = "memory ";
+          if (
+            newPatientDetailItemTypes[j].includes("string") ||
+            newPatientDetailItemTypes[j].includes("[]")
+          )
+            memoryText = "memory ";
           addCateText += `, ${newPatientDetailItemTypes[j]} ${memoryText}${newPatientDetailItems[j]}`;
         }
         addCateText += ") public onlyRole(DOCTOR_ROLE) payable {";
         newLines.push(addCateText);
       } else if (i === 8) {
-        for(let j=0; j<newPatientDetailItems.length; j++) {
-          if(!newCheckedPatientDetailItems[j]) continue;
-          newLines.push(`        patientEntered.${newPatientDetailItems[j]} = ${newPatientDetailItems[j]};`);
+        for (let j = 0; j < newPatientDetailItems.length; j++) {
+          if (!newCheckedPatientDetailItems[j]) continue;
+          newLines.push(
+            `        patientEntered.${newPatientDetailItems[j]} = ${newPatientDetailItems[j]};`
+          );
         }
       } else if (i === 9) {
         let addCateText =
-        "    function addLabResult(uint256 patientId, string memory testName, uint256 testValue";
+          "    function addLabResult(uint256 patientId, string memory testName, uint256 testValue";
         for (let j = 0; j < newLabResultDetailItems.length; j++) {
           if (!newCheckedLabResultsDetailItems[j]) continue;
           let memoryText = "";
-          if(newLabResultDetailItemTypes[j].includes("string") || newLabResultDetailItemTypes[j].includes("[]")) memoryText = "memory ";
+          if (
+            newLabResultDetailItemTypes[j].includes("string") ||
+            newLabResultDetailItemTypes[j].includes("[]")
+          )
+            memoryText = "memory ";
           addCateText += `, ${newLabResultDetailItemTypes[j]} ${memoryText}${newLabResultDetailItems[j]}`;
         }
         addCateText += ") public onlyRole(DOCTOR_ROLE) {";
         newLines.push(addCateText);
-        newLines.push('        require(patients[patientId].age > 0, "There is no patient with the given id.");');
-        newLines.push('        require(patients[patientId].doctorAddress == msg.sender, "This patient is not your patient.");');
+        newLines.push(
+          '        require(patients[patientId].age > 0, "There is no patient with the given id.");'
+        );
+        newLines.push(
+          '        require(patients[patientId].doctorAddress == msg.sender, "This patient is not your patient.");'
+        );
         let text = `        patients[patientId].labResults.push(LabResult(testName, testValue, block.timestamp`;
         for (let j = 0; j < newLabResultDetailItems.length; j++) {
           if (!newCheckedLabResultsDetailItems[j]) continue;
           text += `, ${newLabResultDetailItems[j]}`;
-
         }
-        text += "));" ;
+        text += "));";
         newLines.push(text);
+      }
     }
-  }
     setContractCode(newLines.join("\n"));
   };
 
@@ -219,8 +252,11 @@ const ClinicalTrialData = () => {
   };
 
   const targetNameChange = (event) => {
-    setContractName(event.target.value);
-    setNewContract(event.target.value, contractURI);
+    const inputValue = event.target.value;
+    if (isNaN(inputValue)) {
+      setContractName(inputValue);
+      setNewContract(event.target.value, contractURI);
+    }
   };
 
   const targetURIChange = (event) => {
@@ -261,8 +297,17 @@ const ClinicalTrialData = () => {
       ...checkedPatientDetailItems.slice(index + 1),
     ];
     setCheckedPatientDetailItems(newCheckedPatientDetailList);
-    setNewContract(contractName, contractURI, checkedEventDetailItems,eventDetailItems,eventDetailItemTypes,
-      checkedCategoryItems, categoryItems, categoryItemTypes, newCheckedPatientDetailList);
+    setNewContract(
+      contractName,
+      contractURI,
+      checkedEventDetailItems,
+      eventDetailItems,
+      eventDetailItemTypes,
+      checkedCategoryItems,
+      categoryItems,
+      categoryItemTypes,
+      newCheckedPatientDetailList
+    );
   };
 
   const checkLabResultDetailItem = (value, index) => {
@@ -272,9 +317,20 @@ const ClinicalTrialData = () => {
       ...checkedLabResultDetailItems.slice(index + 1),
     ];
     setCheckedPatientDetailItems(newCheckedLabResultDetailList);
-    setNewContract(contractName, contractURI, checkedEventDetailItems,eventDetailItems,eventDetailItemTypes,
-      checkedCategoryItems, categoryItems, categoryItemTypes, checkedPatientDetailItems, patientDetailItems,patientDetailItemTypes,
-      newCheckedLabResultDetailList);
+    setNewContract(
+      contractName,
+      contractURI,
+      checkedEventDetailItems,
+      eventDetailItems,
+      eventDetailItemTypes,
+      checkedCategoryItems,
+      categoryItems,
+      categoryItemTypes,
+      checkedPatientDetailItems,
+      patientDetailItems,
+      patientDetailItemTypes,
+      newCheckedLabResultDetailList
+    );
   };
 
   const checkCategoryItem = (value, index) => {
@@ -284,13 +340,19 @@ const ClinicalTrialData = () => {
       ...checkedCategoryItems.slice(index + 1),
     ];
     setCheckedCategoryItems(newCheckedCategoryItemList);
-    setNewContract( contractName, contractURI, checkedEventDetailItems,eventDetailItems,eventDetailItemTypes,newCheckedCategoryItemList
+    setNewContract(
+      contractName,
+      contractURI,
+      checkedEventDetailItems,
+      eventDetailItems,
+      eventDetailItemTypes,
+      newCheckedCategoryItemList
     );
   };
 
   const addNewEventDetail = (e) => {
     if (e.key != "Enter") return;
-    if(eventDetailItems.includes(newEventDetailName)) {
+    if (eventDetailItems.includes(newEventDetailName)) {
       alert("Please enter a unique name");
       return;
     }
@@ -351,7 +413,7 @@ const ClinicalTrialData = () => {
 
   const addNewCategoryItem = (e) => {
     if (e.key != "Enter") return;
-    if(categoryItems.includes(newCategoryItemName)) {
+    if (categoryItems.includes(newCategoryItemName)) {
       alert("Please enter a unique name");
       return;
     }
@@ -415,7 +477,7 @@ const ClinicalTrialData = () => {
 
   const addNewPatientItem = (e) => {
     if (e.key != "Enter") return;
-    if(patientDetailItems.includes(newPatientDetailName)) {
+    if (patientDetailItems.includes(newPatientDetailName)) {
       alert("Please enter a unique name");
       return;
     }
@@ -455,7 +517,10 @@ const ClinicalTrialData = () => {
     if (newPatientDetailName.length > 0 && newPatientDetailType.length > 0) {
       const newPatientItemCheckList = [...checkedPatientDetailItems, true];
       setCheckedPatientDetailItems(newPatientItemCheckList);
-      const newPatientItemItemList = [...patientDetailItems, newPatientDetailName];
+      const newPatientItemItemList = [
+        ...patientDetailItems,
+        newPatientDetailName,
+      ];
       setPatientDetailItems(newPatientItemItemList);
       const newPatientItemTypeList = [
         ...patientDetailItemTypes,
@@ -465,8 +530,14 @@ const ClinicalTrialData = () => {
       setNewPatientDetailName("");
       setNewPatientDetailType("");
       setNewContract(
-        contractName, contractURI, checkedEventDetailItems,eventDetailItems,eventDetailItemTypes,
-      checkedCategoryItems, categoryItems, categoryItemTypes,
+        contractName,
+        contractURI,
+        checkedEventDetailItems,
+        eventDetailItems,
+        eventDetailItemTypes,
+        checkedCategoryItems,
+        categoryItems,
+        categoryItemTypes,
         newPatientItemCheckList,
         newPatientItemItemList,
         newPatientItemTypeList
@@ -476,7 +547,7 @@ const ClinicalTrialData = () => {
 
   const addLabResultItem = (e) => {
     if (e.key != "Enter") return;
-    if(labResultDetailItems.includes(newLabResultDetailName)) {
+    if (labResultDetailItems.includes(newLabResultDetailName)) {
       alert("Please enter a unique name");
       return;
     }
@@ -513,10 +584,16 @@ const ClinicalTrialData = () => {
       alert("Please enter a valid name");
       return;
     }
-    if (newLabResultDetailName.length > 0 && newLabResultDetailType.length > 0) {
+    if (
+      newLabResultDetailName.length > 0 &&
+      newLabResultDetailType.length > 0
+    ) {
       const newLabResultItemCheckList = [...checkedLabResultDetailItems, true];
       setCheckedLabResultDetailItems(newLabResultItemCheckList);
-      const newLabResultItemItemList = [...labResultDetailItems, newLabResultDetailName];
+      const newLabResultItemItemList = [
+        ...labResultDetailItems,
+        newLabResultDetailName,
+      ];
       setLabResultDetailItems(newLabResultItemItemList);
       const newLabResultItemTypeList = [
         ...labResultDetailItemTypes,
@@ -526,17 +603,23 @@ const ClinicalTrialData = () => {
       setNewLabResultDetailName("");
       setNewLabResultDetailType("");
       setNewContract(
-        contractName, contractURI, checkedEventDetailItems,eventDetailItems,eventDetailItemTypes,
-      checkedCategoryItems, categoryItems, categoryItemTypes, checkedPatientDetailItems, patientDetailItems,patientDetailItemTypes,
+        contractName,
+        contractURI,
+        checkedEventDetailItems,
+        eventDetailItems,
+        eventDetailItemTypes,
+        checkedCategoryItems,
+        categoryItems,
+        categoryItemTypes,
+        checkedPatientDetailItems,
+        patientDetailItems,
+        patientDetailItemTypes,
         newLabResultItemCheckList,
         newLabResultItemItemList,
         newLabResultItemTypeList
       );
     }
   };
-
-
-
 
   const eventCheckboxViews = [];
   for (let i = 0; i < eventDetailItems.length; i++) {
@@ -584,8 +667,9 @@ const ClinicalTrialData = () => {
         {contractCode ? (
           <SourceCodeView
             key={contractCode}
-            contractName={"Clinical Trial Data Contract Code Editor"}
+            contractName={"ClinicalTrialData"}
             contractCode={contractCode}
+            completeContract={completeContractCode}
           />
         ) : (
           <p>Loading...</p>
@@ -652,34 +736,35 @@ const ClinicalTrialData = () => {
               Clinical Data Center Details
             </Divider>
             {eventCheckboxViews}
-          </FormGroup><Box
+          </FormGroup>
+          <Box
             component="form"
             sx={{
               "& .MuiTextField-root": { m: 1, width: "25ch" },
             }}
             noValidate
             autoComplete="off"
-          > 
-          <div>
-            <TextField
-              style={{ marginTop: "15px" }}
-              onChange={newEventDetailNameChange}
-              label="New Data Center Detail"
-              value={newEventDetailName}
-              defaultValue=""
-              onKeyDown={addNewEventDetail}
-            />
-          </div>
-          <div>
-            <TextField
-              style={{ marginTop: "15px" }}
-              onChange={newEventDetailTypeChange}
-              label="New Data Center Detail Type"
-              value={newEventDetailType}
-              defaultValue=""
-              onKeyDown={addNewEventDetail}
-            />
-          </div>
+          >
+            <div>
+              <TextField
+                style={{ marginTop: "15px" }}
+                onChange={newEventDetailNameChange}
+                label="New Data Center Detail"
+                value={newEventDetailName}
+                defaultValue=""
+                onKeyDown={addNewEventDetail}
+              />
+            </div>
+            <div>
+              <TextField
+                style={{ marginTop: "15px" }}
+                onChange={newEventDetailTypeChange}
+                label="New Data Center Detail Type"
+                value={newEventDetailType}
+                defaultValue=""
+                onKeyDown={addNewEventDetail}
+              />
+            </div>
           </Box>
           <FormGroup>
             <Divider
@@ -689,34 +774,36 @@ const ClinicalTrialData = () => {
               Doctor Details
             </Divider>
             {categoryCheckboxViews}
-          </FormGroup><Box
+          </FormGroup>
+          <Box
             component="form"
             sx={{
               "& .MuiTextField-root": { m: 1, width: "25ch" },
             }}
             noValidate
             autoComplete="off"
-          > 
-          <div>
-            <TextField
-              style={{ marginTop: "15px" }}
-              onChange={newCategoryItemNameChange}
-              label="New Doctor Feature"
-              value={newCategoryItemName}
-              defaultValue=""
-              onKeyDown={addNewCategoryItem}
-            />
-          </div>
-          <div>
-            <TextField
-              style={{ marginTop: "15px" }}
-              onChange={newCategoryItemTypeChange}
-              label="New Doctor Feature Type"
-              value={newCategoryItemType}
-              defaultValue=""
-              onKeyDown={addNewCategoryItem}
-            />
-          </div></Box>
+          >
+            <div>
+              <TextField
+                style={{ marginTop: "15px" }}
+                onChange={newCategoryItemNameChange}
+                label="New Doctor Feature"
+                value={newCategoryItemName}
+                defaultValue=""
+                onKeyDown={addNewCategoryItem}
+              />
+            </div>
+            <div>
+              <TextField
+                style={{ marginTop: "15px" }}
+                onChange={newCategoryItemTypeChange}
+                label="New Doctor Feature Type"
+                value={newCategoryItemType}
+                defaultValue=""
+                onKeyDown={addNewCategoryItem}
+              />
+            </div>
+          </Box>
 
           <FormGroup>
             <Divider
@@ -726,36 +813,36 @@ const ClinicalTrialData = () => {
               Patient Details
             </Divider>
             {patientsCheckboxViews}
-          </FormGroup><Box
+          </FormGroup>
+          <Box
             component="form"
             sx={{
               "& .MuiTextField-root": { m: 1, width: "25ch" },
             }}
             noValidate
             autoComplete="off"
-          > 
-          <div>
-            <TextField
-              style={{ marginTop: "15px" }}
-              onChange={newPatientDetailNameChange}
-              label="New Patient Detail"
-              value={newPatientDetailName}
-              defaultValue=""
-              onKeyDown={addNewPatientItem}
-            />
-          </div>
-          <div>
-            <TextField
-              style={{ marginTop: "15px" }}
-              onChange={newPatientDetailTypeChange}
-              label="New Patient Detail Type"
-              value={newPatientDetailType}
-              defaultValue=""
-              onKeyDown={addNewPatientItem}
-            />
-          </div>
+          >
+            <div>
+              <TextField
+                style={{ marginTop: "15px" }}
+                onChange={newPatientDetailNameChange}
+                label="New Patient Detail"
+                value={newPatientDetailName}
+                defaultValue=""
+                onKeyDown={addNewPatientItem}
+              />
+            </div>
+            <div>
+              <TextField
+                style={{ marginTop: "15px" }}
+                onChange={newPatientDetailTypeChange}
+                label="New Patient Detail Type"
+                value={newPatientDetailType}
+                defaultValue=""
+                onKeyDown={addNewPatientItem}
+              />
+            </div>
           </Box>
-
 
           <FormGroup>
             <Divider
@@ -765,37 +852,36 @@ const ClinicalTrialData = () => {
               Lab Result Details
             </Divider>
             {labResultCheckboxViews}
-          </FormGroup><Box
+          </FormGroup>
+          <Box
             component="form"
             sx={{
               "& .MuiTextField-root": { m: 1, width: "25ch" },
             }}
             noValidate
             autoComplete="off"
-          > 
-          <div>
-            <TextField
-              style={{ marginTop: "15px" }}
-              onChange={newLabResultDetailNameChange}
-              label="New Lab Result Detail"
-              value={newLabResultDetailName}
-              defaultValue=""
-              onKeyDown={addLabResultItem}
-            />
-          </div>
-          <div>
-            <TextField
-              style={{ marginTop: "15px" }}
-              onChange={newLabResultDetailTypeChange}
-              label="New Lab Result Detail Type"
-              value={newLabResultDetailType}
-              defaultValue=""
-              onKeyDown={addLabResultItem}
-            />
-          </div>
+          >
+            <div>
+              <TextField
+                style={{ marginTop: "15px" }}
+                onChange={newLabResultDetailNameChange}
+                label="New Lab Result Detail"
+                value={newLabResultDetailName}
+                defaultValue=""
+                onKeyDown={addLabResultItem}
+              />
+            </div>
+            <div>
+              <TextField
+                style={{ marginTop: "15px" }}
+                onChange={newLabResultDetailTypeChange}
+                label="New Lab Result Detail Type"
+                value={newLabResultDetailType}
+                defaultValue=""
+                onKeyDown={addLabResultItem}
+              />
+            </div>
           </Box>
-
-
         </div>
       </div>
     </div>
