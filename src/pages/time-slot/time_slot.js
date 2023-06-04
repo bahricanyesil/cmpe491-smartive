@@ -90,7 +90,7 @@ const TimeSlot = () => {
         newLines.push(`contract ${newContractName} is ERC721, Pausable, Ownable {`);
       } else if (i === 1) {
         newLines.push(...beforeLines[i]);
-        newLines.push(`    constructor ( ) ERC721( "${newContractURI}" , "${newTokenSymbol}")`);
+        newLines.push(`    constructor ( ) ERC721( "${newContractURI}" , "${newTokenSymbol}") {`);
         newLines.push(`        EventDetails.eventName = "${newEventName}";`);
         newLines.push(`        EventDetails.eventStartTime = ${newEventStartTime};`);
         newLines.push(`        EventDetails.eventEndTime = ${newEventEndTime};`);
