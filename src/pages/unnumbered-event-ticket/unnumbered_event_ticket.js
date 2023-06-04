@@ -14,6 +14,12 @@ const UnNumberedEventTicket = () => {
   const [contractName, setContractName] = useState("UnNumberedTicket");
   const [contractURI, setContractURI] = useState("");
   const [beforeLines, setBeforeLines] = useState([]);
+  const [startDate, setStartDate] = useState(null);
+  const [duration, setDuration] = useState(null);
+  const [locationName, setLocationName] = useState("");
+  const [websiteUrl, setWebsiteUrl] = useState("");
+  const [eventName, setEventName] = useState("");
+
   const [eventDetailItems, setEventDetailItems] = React.useState([
     "startDate",
     "locationName",
@@ -71,6 +77,28 @@ const UnNumberedEventTicket = () => {
       });
   }, []);
 
+  const newStartDateChange = (e) => {
+    setStartDate(e.target.value);
+  };
+
+  const newDurationChange = (e) => {
+    const numericValue = e.target.value.replace(/\D/g, "");
+    e.target.value = numericValue;
+    setDuration(numericValue);
+  };
+
+  const newEventNameChange = (e) => {
+    setEventName(e.target.value);
+  };
+
+  const newWebsiteUrlChange = (e) => {
+    setWebsiteUrl(e.target.value);
+  };
+
+  const newLocationNameChange = (e) => {
+    setLocationName(e.target.value);
+  };
+
   const setNewContract = (
     newContractName,
     targetURIParam,
@@ -96,16 +124,21 @@ const UnNumberedEventTicket = () => {
             `        ${newCategoryItemTypes[j]} ${newCategoryItems[j]};`
           );
         }
-      }else if(i===2) {
+      } else if (i === 2) {
         for (let j = 0; j < newEventDetailItems.length; j++) {
           if (!newCheckedEventDetailItems[j]) continue;
-          newLines.push(`        ${eventDetailItemTypes[j]} ${eventDetailItems[j]};`);
+          newLines.push(
+            `        ${eventDetailItemTypes[j]} ${eventDetailItems[j]};`
+          );
         }
-      }  else if (i === 3) {
+      } else if (i === 3) {
         let constructorText = "    constructor(";
         for (let j = 0; j < newEventDetailItems.length; j++) {
           if (!newCheckedEventDetailItems[j]) continue;
-          if (newEventDetailItemTypes[j].includes("string") || newEventDetailItemTypes[j].includes("[]")) {
+          if (
+            newEventDetailItemTypes[j].includes("string") ||
+            newEventDetailItemTypes[j].includes("[]")
+          ) {
             constructorText += `${newEventDetailItemTypes[j]} memory ${newEventDetailItems[j]}_, `;
           } else {
             constructorText += `${newEventDetailItemTypes[j]} ${newEventDetailItems[j]}_, `;
@@ -136,13 +169,17 @@ const UnNumberedEventTicket = () => {
             lastEl.slice(0, lastEl.length - 1),
           ];
         }
-      }else if (i === 4) {
+      } else if (i === 4) {
         let addCateText =
           "    function addCategory(uint256 price, uint256 capacity";
         for (let j = 0; j < newCategoryItems.length; j++) {
           if (!newCheckedCategoryItems[j]) continue;
           let memoryText = "";
-          if(newCategoryItemTypes[j].includes("string") || newCategoryItemTypes[j].includes("[]")) memoryText = "memory ";
+          if (
+            newCategoryItemTypes[j].includes("string") ||
+            newCategoryItemTypes[j].includes("[]")
+          )
+            memoryText = "memory ";
           addCateText += `, ${newCategoryItemTypes[j]} ${memoryText}${newCategoryItems[j]}`;
         }
         addCateText += ") public onlyOwner {";
@@ -152,18 +189,21 @@ const UnNumberedEventTicket = () => {
             '        require(!checkEventPassed(), "Event has already occurred.");'
           );
       } else if (i === 5) {
-        if(newCheckedCategoryItems[0]) {
+        if (newCheckedCategoryItems[0]) {
           newLines.push("        for(uint256 i=0; i<supplies.length; i++) {");
-          newLines.push('            require(!compareStrings(categories[i].name, name), "There is already a category with the same name.");');
+          newLines.push(
+            '            require(!compareStrings(categories[i].name, name), "There is already a category with the same name.");'
+          );
           newLines.push("        }");
         }
       } else if (i === 6) {
-        let createCateModelText = "        categories[tokenId] = EventCategory(tokenId, price, capacity, 0";
-        for(let j=0; j<newCategoryItems.length; j++) {
-          if(!newCheckedCategoryItems[j]) continue;
+        let createCateModelText =
+          "        categories[tokenId] = EventCategory(tokenId, price, capacity, 0";
+        for (let j = 0; j < newCategoryItems.length; j++) {
+          if (!newCheckedCategoryItems[j]) continue;
           createCateModelText += `, ${newCategoryItems[j]}`;
         }
-        createCateModelText += ');';
+        createCateModelText += ");";
         newLines.push(createCateModelText);
       } else if (i === 7) {
         if (newCheckedEventDetailItems[0])
@@ -204,7 +244,7 @@ const UnNumberedEventTicket = () => {
       setNewContract(event.target.value, contractURI);
     }
   };
-  
+
   const targetURIChange = (event) => {
     setContractURI(event.target.value);
     setNewContract(contractName, event.target.value);
@@ -255,7 +295,7 @@ const UnNumberedEventTicket = () => {
 
   const addNewEventDetail = (e) => {
     if (e.key != "Enter") return;
-    if(eventDetailItems.includes(newEventDetailName)) {
+    if (eventDetailItems.includes(newEventDetailName)) {
       alert("Please enter a unique name");
       return;
     }
@@ -316,7 +356,7 @@ const UnNumberedEventTicket = () => {
 
   const addNewCategoryItem = (e) => {
     if (e.key != "Enter") return;
-    if(categoryItems.includes(newCategoryItemName)) {
+    if (categoryItems.includes(newCategoryItemName)) {
       alert("Please enter a unique name");
       return;
     }
@@ -407,6 +447,13 @@ const UnNumberedEventTicket = () => {
             contractName={"UnNumberedEventTicket"}
             contractCode={contractCode}
             completeContract={completeContractCode}
+            constructorParams={[
+              new Date(startDate).getTime() / 1000,
+              locationName,
+              websiteUrl,
+              eventName,
+              duration,
+            ]}
           />
         ) : (
           <p>Loading...</p>
@@ -464,8 +511,69 @@ const UnNumberedEventTicket = () => {
             </div>{" "}
           </Box>
         </div>
-        <div style={{ padding: "16px 24px", color: "#44596e" }}>
+        <div style={{ marginTop: "10px", color: "#44596e" }}>
           <FormGroup>
+            <Divider
+              style={{ marginTop: "10px", marginBottom: "8px" }}
+              spacing={1}
+            >
+              Construction Parameters
+            </Divider>
+          </FormGroup>
+          <Box
+            component="form"
+            sx={{
+              "& .MuiTextField-root": { m: 1, width: "25ch" },
+            }}
+            noValidate
+            autoComplete="off"
+          >
+            <div style={{ marginTop: "15px", marginBottom: "15px" }}>
+              <label style={{ marginRight: "8px" }} htmlFor="dateInput">
+                Select a Start Date:{" "}
+              </label>
+              <input
+                type="date"
+                id="startDateInput"
+                value={startDate}
+                onChange={newStartDateChange}
+              />
+            </div>
+            <div>
+              <TextField
+                label="Duration"
+                onChange={newDurationChange}
+                inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+              />
+            </div>
+            <div style={{ marginTop: "15px" }}>
+              <TextField
+                required
+                onChange={newLocationNameChange}
+                id="outlined-required"
+                label="Location Name"
+              />
+            </div>
+            <div style={{ marginTop: "15px" }}>
+              <TextField
+                required
+                onChange={newWebsiteUrlChange}
+                id="outlined-required"
+                label="Website URL"
+              />
+            </div>
+            <div style={{ marginTop: "15px" }}>
+              <TextField
+                required
+                onChange={newEventNameChange}
+                id="outlined-required"
+                label="Event Name"
+              />
+            </div>
+          </Box>
+        </div>
+        <div style={{ padding: "0px 24px", color: "#44596e" }}>
+          {/*<FormGroup>
             <Divider
               style={{ marginTop: "10px", marginBottom: "8px" }}
               spacing={1}
@@ -473,7 +581,8 @@ const UnNumberedEventTicket = () => {
               Event Details
             </Divider>
             {eventCheckboxViews}
-          </FormGroup><Box
+          </FormGroup>
+          <Box
             component="form"
             sx={{
               "& .MuiTextField-root": { m: 1, width: "25ch" },
@@ -501,7 +610,7 @@ const UnNumberedEventTicket = () => {
               onKeyDown={addNewEventDetail}
             />
           </div>
-          </Box>
+          </Box> */}
           <FormGroup>
             <Divider
               style={{ marginTop: "30px", marginBottom: "20px" }}
@@ -510,34 +619,36 @@ const UnNumberedEventTicket = () => {
               Category Items
             </Divider>
             {categoryCheckboxViews}
-          </FormGroup><Box
+          </FormGroup>
+          <Box
             component="form"
             sx={{
               "& .MuiTextField-root": { m: 1, width: "25ch" },
             }}
             noValidate
             autoComplete="off"
-          > 
-          <div>
-            <TextField
-              style={{ marginTop: "15px" }}
-              onChange={newCategoryItemNameChange}
-              label="New Category Item"
-              value={newCategoryItemName}
-              defaultValue=""
-              onKeyDown={addNewCategoryItem}
-            />
-          </div>
-          <div>
-            <TextField
-              style={{ marginTop: "15px" }}
-              onChange={newCategoryItemTypeChange}
-              label="New Category Item Type"
-              value={newCategoryItemType}
-              defaultValue=""
-              onKeyDown={addNewCategoryItem}
-            />
-          </div></Box>
+          >
+            <div>
+              <TextField
+                style={{ marginTop: "15px" }}
+                onChange={newCategoryItemNameChange}
+                label="New Category Item"
+                value={newCategoryItemName}
+                defaultValue=""
+                onKeyDown={addNewCategoryItem}
+              />
+            </div>
+            <div>
+              <TextField
+                style={{ marginTop: "15px" }}
+                onChange={newCategoryItemTypeChange}
+                label="New Category Item Type"
+                value={newCategoryItemType}
+                defaultValue=""
+                onKeyDown={addNewCategoryItem}
+              />
+            </div>
+          </Box>
         </div>
       </div>
     </div>

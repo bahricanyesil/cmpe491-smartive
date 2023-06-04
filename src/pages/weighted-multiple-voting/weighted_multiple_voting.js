@@ -100,34 +100,43 @@ const WeightedMultipleVoting = () => {
         }
         newLines.push(`    }`);
       } else if (i === 3) {
-        let constructorText = "    constructor()";
-        // for (let j = 0; j < newEventDetailItems.length; j++) {
-        //   if (!newCheckedEventDetailItems[j]) continue;
-        //   constructorText +=
-        //     ", " +
-        //     newEventDetailItemTypes[j] +
-        //     "[] memory candidate" +
-        //     newEventDetailItems[j] +
-        //     "s";
-        // }
-        // for (let j = 0; j < newCategoryItems.length; j++) {
-        //   if (!newCheckedCategoryItems[j]) continue;
-        //   if (
-        //     newCategoryItemTypes[j].includes("string") ||
-        //     newCategoryItemTypes[j].includes("[]")
-        //   ) {
-        //     constructorText +=
-        //       ", " +
-        //       newCategoryItemTypes[j] +
-        //       " memory owner" +
-        //       newCategoryItems[j];
-        //   } else {
-        //     constructorText +=
-        //       ", " + newCategoryItemTypes[j] + " owner" + newCategoryItems[j];
-        //   }
-        // }
-        // constructorText +=
-        //   ", uint256 maxVotes, uint256 ownerWeight, uint256 startTime_, uint256 endTime_)";
+        let constructorText = "    constructor(";
+        for (let j = 0; j < newEventDetailItems.length; j++) {
+          if (!newCheckedEventDetailItems[j]) continue;
+          constructorText +=
+            ", " +
+            newEventDetailItemTypes[j] +
+            "[] memory candidate" +
+            newEventDetailItems[j] +
+            "s";
+        }
+        let checkedItemAtLeast1 =false;
+        let isFirst = true;
+        for (let j = 0; j < newCategoryItems.length; j++) {
+          if (!newCheckedCategoryItems[j]) continue;
+          checkedItemAtLeast1 = true;
+          if (
+            newCategoryItemTypes[j].includes("string") ||
+            newCategoryItemTypes[j].includes("[]")
+          ) {
+            if(!isFirst) {
+              constructorText += ", ";
+              isFirst=false;
+            }
+            constructorText +=
+              newCategoryItemTypes[j] +
+              " memory owner" +
+              newCategoryItems[j];
+          } else {
+            constructorText +=
+              ", " + newCategoryItemTypes[j] + " owner" + newCategoryItems[j];
+          }
+        }
+        if(checkedItemAtLeast1) {
+          constructorText += ", ";
+        }
+        constructorText +=
+          "string[] memory candidateNames, uint256 maxVotes, uint256 ownerWeight, uint256 startTime_, uint256 endTime_)";
         newLines.push(constructorText);
         newLines.push(`    ERC20("${newTokenName}", "${newTokenSymbol}")`);
       } else if (i === 4) {
@@ -406,6 +415,7 @@ const WeightedMultipleVoting = () => {
       return;
     } else {
       setCandidateNames([...candidateNames, newCandidateName]);
+      setCheckedCandidateNames([...checkedCandidateNames, true]);
       setNewCandidateName("");
     }
   };
@@ -517,6 +527,7 @@ const WeightedMultipleVoting = () => {
       />
     );
   }
+
   const selectedCandidateNames = [];
   for (let i = 0; i < candidateNames.length; i++) {
     if (checkedCandidateNames[i]) {
@@ -639,7 +650,7 @@ const WeightedMultipleVoting = () => {
             </label>
             <input
               type="date"
-              id="endDateInput"
+              id="startDateInput"
               value={startDate}
               onChange={newStartDateChange}
             />
@@ -650,7 +661,7 @@ const WeightedMultipleVoting = () => {
             </label>
             <input
               type="date"
-              id="startDateInput"
+              id="endDateInput"
               value={endDate}
               onChange={newEndDateChange}
             />
@@ -746,6 +757,7 @@ const WeightedMultipleVoting = () => {
             <div>
               <TextField
                 onChange={updateMaxVotes}
+                label="Max Vote Number"
                 inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
               />
             </div>
@@ -770,13 +782,14 @@ const WeightedMultipleVoting = () => {
           >
             <div>
               <TextField
+                label="Owner Weight"
                 onChange={updateOwnerWeight}
                 inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
               />
             </div>
           </Box>
         </div>
-        <div style={{ padding: "16px 24px", color: "#44596e" }}>
+        {/* <div style={{ padding: "16px 24px", color: "#44596e" }}>
           <FormGroup>
             <Divider
               style={{ marginTop: "10px", marginBottom: "8px" }}
@@ -815,7 +828,7 @@ const WeightedMultipleVoting = () => {
               />
             </div>
           </Box>
-        </div>
+        </div> */}
       </div>
     </div>
   );

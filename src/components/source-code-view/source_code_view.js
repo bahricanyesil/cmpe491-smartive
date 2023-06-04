@@ -37,6 +37,7 @@ const SourceCodeView = ({
   const deployContract = async () => {
     for(let i=0;i<constructorParams.length;i++){
       if(constructorParams[i] == null || constructorParams[i].length===0){
+        console.log(constructorParams)
         alert("Please fill all the constructor parameters!");
         return;
       }
