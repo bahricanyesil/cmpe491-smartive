@@ -10,6 +10,10 @@ import WeightedMultipleVotingContract from "../../contracts/Weighted_Multiple_Vo
 
 const WeightedMultipleVoting = () => {
   const [contractCode, setContractCode] = useState(null);
+  const [startDate, setStartDate] = useState(null);
+  const [endDate, setEndDate] = useState(null);
+  const [ownerWeight, setOwnerWeight] = useState(null);
+  const [maxVotes, setMaxVotes] = useState(null);
   const [completeContractCode, setCompleteContractCode] = useState("");
   const [contractName, setContractName] = useState("WeightedMultipleVoting");
   const [tokenName, setTokenName] = useState("WeightedToken");
@@ -20,6 +24,7 @@ const WeightedMultipleVoting = () => {
   const [checkedEventDetailItems, setCheckedEventDetailItems] = React.useState(
     []
   );
+  const [checkedCandidateNames, setCheckedCandidateNames] = React.useState([]);
   const [newEventDetailName, setNewEventDetailName] = useState("");
   const [newEventDetailType, setNewEventDetailType] = useState("");
   const [updatableStartTime, setUpdatableStartTime] = useState(true);
@@ -30,7 +35,9 @@ const WeightedMultipleVoting = () => {
     true,
   ]);
   const [newCategoryItemName, setNewCategoryItemName] = useState("");
+  const [newCandidateName, setNewCandidateName] = useState("");
   const [newCategoryItemType, setNewCategoryItemType] = useState("");
+  const [candidateNames, setCandidateNames] = useState([]);
 
   useEffect(() => {
     fetch(WeightedMultipleVotingContract)
@@ -93,34 +100,34 @@ const WeightedMultipleVoting = () => {
         }
         newLines.push(`    }`);
       } else if (i === 3) {
-        let constructorText = "    constructor(string[] memory candidateNames";
-        for (let j = 0; j < newEventDetailItems.length; j++) {
-          if (!newCheckedEventDetailItems[j]) continue;
-          constructorText +=
-            ", " +
-            newEventDetailItemTypes[j] +
-            "[] memory candidate" +
-            newEventDetailItems[j] +
-            "s";
-        }
-        for (let j = 0; j < newCategoryItems.length; j++) {
-          if (!newCheckedCategoryItems[j]) continue;
-          if (
-            newCategoryItemTypes[j].includes("string") ||
-            newCategoryItemTypes[j].includes("[]")
-          ) {
-            constructorText +=
-              ", " +
-              newCategoryItemTypes[j] +
-              " memory owner" +
-              newCategoryItems[j];
-          } else {
-            constructorText +=
-              ", " + newCategoryItemTypes[j] + " owner" + newCategoryItems[j];
-          }
-        }
-        constructorText +=
-          ", uint256 maxVotes, uint256 ownerWeight, uint256 startTime_, uint256 endTime_)";
+        let constructorText = "    constructor()";
+        // for (let j = 0; j < newEventDetailItems.length; j++) {
+        //   if (!newCheckedEventDetailItems[j]) continue;
+        //   constructorText +=
+        //     ", " +
+        //     newEventDetailItemTypes[j] +
+        //     "[] memory candidate" +
+        //     newEventDetailItems[j] +
+        //     "s";
+        // }
+        // for (let j = 0; j < newCategoryItems.length; j++) {
+        //   if (!newCheckedCategoryItems[j]) continue;
+        //   if (
+        //     newCategoryItemTypes[j].includes("string") ||
+        //     newCategoryItemTypes[j].includes("[]")
+        //   ) {
+        //     constructorText +=
+        //       ", " +
+        //       newCategoryItemTypes[j] +
+        //       " memory owner" +
+        //       newCategoryItems[j];
+        //   } else {
+        //     constructorText +=
+        //       ", " + newCategoryItemTypes[j] + " owner" + newCategoryItems[j];
+        //   }
+        // }
+        // constructorText +=
+        //   ", uint256 maxVotes, uint256 ownerWeight, uint256 startTime_, uint256 endTime_)";
         newLines.push(constructorText);
         newLines.push(`    ERC20("${newTokenName}", "${newTokenSymbol}")`);
       } else if (i === 4) {
@@ -239,6 +246,10 @@ const WeightedMultipleVoting = () => {
     setNewCategoryItemType(event.target.value);
   };
 
+  const newCandidateNameChange = (event) => {
+    setNewCandidateName(event.target.value);
+  };
+
   const checkEventDetailItem = (value, index) => {
     const newCheckedEventDetailList = [
       ...checkedEventDetailItems.slice(0, index),
@@ -252,6 +263,15 @@ const WeightedMultipleVoting = () => {
       tokenSymbol,
       newCheckedEventDetailList
     );
+  };
+
+  const checkCandidateName = (value, index) => {
+    const newCheckedCandidateNames = [
+      ...checkedCandidateNames.slice(0, index),
+      value,
+      ...checkedCandidateNames.slice(index + 1),
+    ];
+    setCheckedCandidateNames(newCheckedCandidateNames);
   };
 
   const checkUpdatableStartTime = (event) => {
@@ -366,6 +386,38 @@ const WeightedMultipleVoting = () => {
     }
   };
 
+  const updateMaxVotes = (event) => {
+    const numericValue = event.target.value.replace(/\D/g, "");
+    event.target.value = numericValue;
+    setMaxVotes(numericValue);
+  };
+
+  const updateOwnerWeight = (event) => {
+    const numericValue = event.target.value.replace(/\D/g, "");
+    event.target.value = numericValue;
+    setOwnerWeight(numericValue);
+  };
+
+  const addNewCandidateName = (e) => {
+    if (e.key != "Enter") return;
+    e.preventDefault();
+    if (candidateNames.includes(newCandidateName)) {
+      alert("Please enter a unique name");
+      return;
+    } else {
+      setCandidateNames([...candidateNames, newCandidateName]);
+      setNewCandidateName("");
+    }
+  };
+
+  const newStartDateChange = (e) => {
+    setStartDate(e.target.value);
+  };
+
+  const newEndDateChange = (e) => {
+    setEndDate(e.target.value);
+  };
+
   const addNewCategoryItem = (e) => {
     if (e.key != "Enter") return;
     if (categoryItems.includes(newCategoryItemName)) {
@@ -444,6 +496,17 @@ const WeightedMultipleVoting = () => {
     );
   }
 
+  const candidateNamesCheckboxes = [];
+  for (let i = 0; i < candidateNames.length; i++) {
+    candidateNamesCheckboxes.push(
+      <CustomCheckbox
+        key={candidateNames[i]}
+        label={candidateNames[i]}
+        onChange={(event) => checkCandidateName(event.target.checked, i)}
+      />
+    );
+  }
+
   const categoryCheckboxViews = [];
   for (let i = 0; i < categoryItems.length; i++) {
     categoryCheckboxViews.push(
@@ -453,6 +516,12 @@ const WeightedMultipleVoting = () => {
         onChange={(event) => checkCategoryItem(event.target.checked, i)}
       />
     );
+  }
+  const selectedCandidateNames = [];
+  for (let i = 0; i < candidateNames.length; i++) {
+    if (checkedCandidateNames[i]) {
+      selectedCandidateNames.push(candidateNames[i]);
+    }
   }
 
   return (
@@ -464,6 +533,13 @@ const WeightedMultipleVoting = () => {
             contractName={"WeightedMultipleVoting"}
             contractCode={contractCode}
             completeContract={completeContractCode}
+            constructorParams={[
+              selectedCandidateNames,
+              maxVotes,
+              ownerWeight,
+              new Date(startDate).getTime() / 1000,
+              new Date(endDate).getTime() / 1000,
+            ]}
           />
         ) : (
           <p>Loading...</p>
@@ -548,7 +624,69 @@ const WeightedMultipleVoting = () => {
             />
           </FormGroup>
         </div>
+        <div style={{ color: "#44596e" }}>
+          <FormGroup>
+            <Divider
+              style={{ marginTop: "8px", marginBottom: "8px" }}
+              spacing={1}
+            >
+              Start and End Date
+            </Divider>
+          </FormGroup>
+          <div>
+            <label style={{ marginRight: "8px" }} htmlFor="dateInput">
+              Select a Start Date:{" "}
+            </label>
+            <input
+              type="date"
+              id="endDateInput"
+              value={startDate}
+              onChange={newStartDateChange}
+            />
+          </div>
+          <div style={{ marginTop: "10px" }}>
+            <label style={{ marginRight: "8px" }} htmlFor="dateInput">
+              Select a End Date:{" "}
+            </label>
+            <input
+              type="date"
+              id="startDateInput"
+              value={endDate}
+              onChange={newEndDateChange}
+            />
+          </div>
+        </div>
         <div style={{ padding: "16px 24px", color: "#44596e" }}>
+          <FormGroup>
+            <Divider
+              style={{ marginTop: "10px", marginBottom: "8px" }}
+              spacing={1}
+            >
+              Add a Candidate
+            </Divider>
+            {candidateNamesCheckboxes}
+          </FormGroup>
+          <Box
+            component="form"
+            sx={{
+              "& .MuiTextField-root": { m: 1, width: "25ch" },
+            }}
+            noValidate
+            autoComplete="off"
+          >
+            <div>
+              <TextField
+                style={{ marginTop: "15px" }}
+                onChange={newCandidateNameChange}
+                label="Candidate Name"
+                value={newCandidateName}
+                defaultValue=""
+                onKeyDown={addNewCandidateName}
+              />
+            </div>
+          </Box>
+        </div>
+        {/* <div style={{ padding: "16px 24px", color: "#44596e" }}>
           <FormGroup>
             <Divider
               style={{ marginTop: "10px", marginBottom: "8px" }}
@@ -584,6 +722,56 @@ const WeightedMultipleVoting = () => {
                 value={newEventDetailType}
                 defaultValue=""
                 onKeyDown={addNewEventDetail}
+              />
+            </div>
+          </Box>
+        </div> */}
+        <div style={{ color: "#44596e" }}>
+          <FormGroup>
+            <Divider
+              style={{ marginTop: "10px", marginBottom: "8px" }}
+              spacing={1}
+            >
+              Max Vote Number
+            </Divider>
+          </FormGroup>
+          <Box
+            component="form"
+            sx={{
+              "& .MuiTextField-root": { m: 1, width: "25ch" },
+            }}
+            noValidate
+            autoComplete="off"
+          >
+            <div>
+              <TextField
+                onChange={updateMaxVotes}
+                inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
+              />
+            </div>
+          </Box>
+        </div>
+        <div style={{ color: "#44596e" }}>
+          <FormGroup>
+            <Divider
+              style={{ marginTop: "10px", marginBottom: "8px" }}
+              spacing={1}
+            >
+              Owner Weight
+            </Divider>
+          </FormGroup>
+          <Box
+            component="form"
+            sx={{
+              "& .MuiTextField-root": { m: 1, width: "25ch" },
+            }}
+            noValidate
+            autoComplete="off"
+          >
+            <div>
+              <TextField
+                onChange={updateOwnerWeight}
+                inputProps={{ inputMode: "numeric", pattern: "[0-9]*" }}
               />
             </div>
           </Box>
