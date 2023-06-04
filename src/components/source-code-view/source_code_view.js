@@ -1,9 +1,9 @@
-import AssignmentIcon from '@mui/icons-material/Assignment';
+import AssignmentIcon from "@mui/icons-material/Assignment";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import CodeIcon from '@mui/icons-material/Code';
+import CodeIcon from "@mui/icons-material/Code";
 import ConstructionIcon from "@mui/icons-material/Construction";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
-import LocationOnIcon from '@mui/icons-material/LocationOn';
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 import MuiAlert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
@@ -23,6 +23,7 @@ const SourceCodeView = ({ contractName, contractCode, completeContract }) => {
   const [deployedAddress, setDeployedAddress] = useState("");
   const [code, setCode] = useState(contractCode);
   const [open, setOpen] = useState(false);
+  const [deployingContract, setDeployingContract] = useState(false);
   const [userAddress, setUserAddress] = useState([]);
   const [compileLoading, setCompileLoading] = useState(false);
   const [deployLoading, setDeployLoading] = useState(false);
@@ -44,6 +45,7 @@ const SourceCodeView = ({ contractName, contractCode, completeContract }) => {
         }
         const bytecode = compiledCode.evm?.bytecode?.object;
         const contract = new web3.eth.Contract(compiledCode.abi);
+        setDeployingContract(true);
         try {
           await contract
             .deploy({ data: bytecode })
@@ -63,6 +65,8 @@ const SourceCodeView = ({ contractName, contractCode, completeContract }) => {
         } catch (error) {
           console.log("Error:", error);
           console.log(error);
+        } finally {
+          setDeployingContract(false);
         }
       });
     } else {
@@ -193,20 +197,24 @@ const SourceCodeView = ({ contractName, contractCode, completeContract }) => {
       </Snackbar>
       {compiledCode ? (
         <div style={{ marginBottom: "15px", marginTop: "15px" }}>
-          <Button
-            startIcon={<LocationOnIcon />}
-            onClick={copyDeployedContractAddress}
-            style={{ marginLeft: "5px" }}
-            sx={{ backgroundColor: teal[500], color: '#fff' }}
-            variant="contained"
-          >
-            Copy Contract Address
-          </Button>
+          {deployedAddress || deployingContract ? (
+            <Button
+              startIcon={<LocationOnIcon />}
+              onClick={copyDeployedContractAddress}
+              style={{ marginLeft: "5px" }}
+              sx={{ backgroundColor: teal[500], color: "#fff" }}
+              variant="contained"
+            >
+              {deployingContract ? "Loading..." : "Copy Contract Address"}
+            </Button>
+          ) : (
+            <div></div>
+          )}
           <Button
             startIcon={<AssignmentIcon />}
             onClick={copyABI}
             style={{ marginLeft: "5px" }}
-            sx={{ backgroundColor: amber[500], color: '#fff' }}
+            sx={{ backgroundColor: amber[500], color: "#fff" }}
             variant="contained"
           >
             Copy ABI
@@ -215,7 +223,7 @@ const SourceCodeView = ({ contractName, contractCode, completeContract }) => {
             startIcon={<CodeIcon />}
             onClick={copyByteCode}
             style={{ marginLeft: "5px" }}
-            sx={{ backgroundColor: deepOrange[500], color: '#fff' }}
+            sx={{ backgroundColor: deepOrange[500], color: "#fff" }}
             variant="contained"
           >
             Copy ByteCode
