@@ -16,6 +16,7 @@ import TimeSlot from './pages/time-slot/time_slot';
 import TravelTicket from './pages/travel-ticket/travel_ticket';
 import UnNumberedEventTicket from './pages/unnumbered-event-ticket/unnumbered_event_ticket';
 import WeightedMultipleVoting from './pages/weighted-multiple-voting/weighted_multiple_voting';
+import Management from './pages/management/management';
 
 const App = () => {
   
@@ -64,6 +65,9 @@ const App = () => {
         </Routes>
         <Routes>
           <Route path='/weighted-multiple-voting' element={<WeightedMultipleVoting/>} />
+        </Routes>
+        <Routes>
+          <Route path='/management' element={<Management/>} />
         </Routes>
         {/* <Routes>
           <Route path='/compile-contract' element={<CompileContract/>} />
