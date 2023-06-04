@@ -1,6 +1,6 @@
+import { Button, List, ListItem, ListItemText, TextField, Typography } from '@material-ui/core';
 import React, { useState } from 'react';
 import Web3 from 'web3';
-import { TextField, Button, List, ListItem, ListItemText, Typography } from '@material-ui/core';
 
 
 const ContractTransactionsPage = () => {
