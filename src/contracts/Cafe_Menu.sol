@@ -588,14 +588,14 @@ contract CafeMenu is ERC1155, Ownable {
         lastUpdate = block.timestamp;
     }
 
-    function addNewMenuItem(uint256 price, string memory name, uint8 itemType, uint256 calories, uint256 preparationTime, string[] memory ingredients, uint256 initialAmount) public onlyOwner {
-        require(itemType <= uint8(MenuItemType.FRUIT));
-        require(price >= 0);
-        require(calories > 0);
-        require(preparationTime > 0);
-        require(ingredients.length > 0);
+    function addNewMenuItem(uint256 price, uint8 itemType, uint256 initialAmount, string memory name, uint256 calories, uint256 preparationTime, string[] memory ingredients) public onlyOwner {
+        require(itemType <= uint8(MenuItemType.FRUIT), "Menu item type is out of range.");
+        require(price >= 0, "Price should be greater than or equal to 0.");
+        require(calories > 0, "Calories should be greater than 0.");
+        require(preparationTime > 0, "Preparation time should be greater than 0.");
+        require(ingredients.length > 0, "Ingredients can not be empty.");
         for(uint256 i=0; i<supplies.length; i++) {
-            require(!compareStrings(menuItems[i].name, name));
+            require(!compareStrings(menuItems[i].name, name), "There is already a menu item with the same name.");
         }
         uint256 tokenId = _tokenIdCounter.current();
         _tokenIdCounter.increment();
@@ -613,35 +613,35 @@ contract CafeMenu is ERC1155, Ownable {
     }
 
     function getItemAvailability(uint256 _id) public view returns(uint256 availableNumber) {
-        require(_id <= supplies.length - 1);
+        require(_id <= supplies.length - 1, "The item couldn't find.");
         return supplies[_id] - menuItems[_id].soldNumber;
     }
 
     function getItemSoldNumber(uint256 _id) public view returns(uint256 soldNumber) {
-        require(_id <= supplies.length - 1);
+        require(_id <= supplies.length - 1, "The item couldn't find.");
         return menuItems[_id].soldNumber;
     }
 
     function getItemById(uint256 _id) private view returns(MenuItem memory item) {
-        require(_id <= supplies.length - 1);
+        require(_id <= supplies.length - 1, "The item couldn't find.");
         return menuItems[_id];
     }
 
     function getAddressOrder() private view returns(Order memory order) {
-        require(orders[msg.sender].amount > 0);
+        require(orders[msg.sender].amount > 0, "You don't have any order.");
         return orders[msg.sender];
     }
 
     function updateItemData(uint256 itemId, uint256 price, string memory name, uint8 itemType, uint256 calories, uint256 preparationTime, string[] memory ingredients) public onlyOwner {
-        require(itemType <= uint8(MenuItemType.FRUIT));
-        require(price >= 0);
-        require(calories > 0);
-        require(preparationTime > 0);
-        require(ingredients.length > 0);
-        require(supplies.length > 0);
-        require(itemId <= supplies.length-1 && itemId >= 0);
+        require(itemType <= uint8(MenuItemType.FRUIT), "Menu item type is out of range.");
+        require(price >= 0, "Price should be greater than or equal to 0.");
+        require(calories > 0, "Calories should be greater than 0.");
+        require(preparationTime > 0, "Preparation time should be greater than 0.");
+        require(ingredients.length > 0, "Ingredients can not be empty.");
+        require(supplies.length > 0, "There is no item to update.");
+        require(itemId <= supplies.length-1 && itemId >= 0, "Menu item does not exist.");
         for(uint256 i=0; i<supplies.length; i++) {
-            require(!compareStrings(menuItems[i].name, name));
+            require(!compareStrings(menuItems[i].name, name), "There is already a menu item with the same name.");
         }
         menuItems[itemId].price = price;
         menuItems[itemId].name = name;
@@ -653,20 +653,20 @@ contract CafeMenu is ERC1155, Ownable {
     }
 
     function produceItem(uint256 id, uint256 amount) public onlyOwner {
-        require(supplies.length > 0);
-        require(id <= supplies.length-1 && id >= 0);
+        require(supplies.length > 0, "There is no item to produce.");
+        require(id <= supplies.length-1 && id >= 0, "Menu item does not exist.");
         supplies[id] = supplies[id] + amount;
         _mint(owner(), id, amount, "");
         lastUpdate = block.timestamp;
     }
 
     function buyItem(uint256 id, uint256 amount) public payable {
-        require(supplies.length > 0);
-        require(id <= supplies.length-1 && id >= 0);
-        require(amount > 0);
-        require(supplies[id] - menuItems[id].soldNumber >= amount);
-        require(msg.value >= (menuItems[id].price * amount));
-        require(orders[msg.sender].amount == 0);
+        require(supplies.length > 0, "There is no item to buy.");
+        require(id <= supplies.length-1 && id >= 0, "Menu item does not exist.");
+        require(amount > 0, "The amount should be greater than 0.");
+        require(supplies[id] - menuItems[id].soldNumber >= amount, "There is no enough produced item.");
+        require(msg.value >= (menuItems[id].price * amount), "You don't have enough price.");
+        require(orders[msg.sender].amount == 0, "You already have an order to wait for receiving, first get it.");
         _safeTransferFrom(owner(), msg.sender, id, amount, "");
         menuItems[id].soldNumber += amount;
         orders[msg.sender] = Order(id, msg.sender, amount, false);
@@ -674,11 +674,11 @@ contract CafeMenu is ERC1155, Ownable {
     }
 
     function receiveItem(uint256 id, uint256 amount) public {
-        require(supplies.length > 0);
-        require(id <= supplies.length-1 && id >= 0);
-        require(amount > 0);
-        require(balanceOf(msg.sender, id) >= amount);
-        require(orders[msg.sender].amount > 0);
+        require(supplies.length > 0, "There is no item to receive.");
+        require(id <= supplies.length-1 && id >= 0, "Menu item does not exist.");
+        require(amount > 0, "The amount should be greater than 0.");
+        require(balanceOf(msg.sender, id) >= amount, "You didn't have item with the amount you gave.");
+        require(orders[msg.sender].amount > 0, "You don't have any order to receive.");
         orders[msg.sender].received = true;
         _burn(msg.sender, id, amount);
         lastUpdate = block.timestamp;
@@ -689,8 +689,8 @@ contract CafeMenu is ERC1155, Ownable {
     }
 
     function withdraw() public onlyOwner {
-        require(address(this).balance > 0);
+        require(address(this).balance > 0, "Balance is 0.");
         (bool success, ) = payable(owner()).call{value: address(this).balance}("");
-        require(success);
+        require(success, "Withdraw couldn't be completed.");
     }
 }

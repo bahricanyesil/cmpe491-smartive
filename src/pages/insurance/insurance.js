@@ -1,11 +1,12 @@
-import React, { useEffect, useState } from 'react';
-import SourceCodeView from '../../components/source-code-view/source_code_view';
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
+import React, { useEffect, useState } from 'react';
+import SourceCodeView from '../../components/source-code-view/source_code_view';
 import insuranceContract from '../../contracts/insurance.sol';
 
 const Insurance = () => {
   const [contractCode, setContractCode] = useState(null);
+  const [completeContractCode, setCompleteContractCode] = useState("");
   const [contractName, setContractName] = useState("Insurance");
   const [contractURI, setContractURI] = useState("");
   const [tokenSymbol, setTokenSymbol] = useState("");
@@ -28,20 +29,26 @@ const Insurance = () => {
     fetch(insuranceContract)
       .then((r) => r.text())
       .then((text) => {
+        setCompleteContractCode(text);
+        const startIndex = text.indexOf("contract Insurance");
+        text = text.substring(startIndex - 1);
         setContractCode(text);
         const allLines = text.split("\n");
         setBeforeLines([
-          allLines.slice(0, 6),
-          allLines.slice(7, 28),
-          allLines.slice(36, 97),
+          allLines.slice(0, 6 - 5),
+          allLines.slice(7 - 5, 28 - 5),
+          allLines.slice(36 - 5, 97 - 5),
         ]);
       });
   }, []);
 
 
   const targetNameChange = (event) => {
-    setContractName(event.target.value);
-    setNewContract(event.target.value);                         // CONTRACT CREATION
+    const inputValue = event.target.value;
+    if (isNaN(inputValue)) {
+      setContractName(inputValue);
+      setNewContract(event.target.value);
+    }
   };
 
   const targetURIChange = (event) => {
@@ -121,8 +128,9 @@ const Insurance = () => {
         {contractCode ? (
           <SourceCodeView
             key={contractCode}
-            contractName={"Insurance Contract Code Editor"}
+            contractName={"Insurance"}
             contractCode={contractCode}
+            completeContract={completeContractCode}
           />
         ) : (
           <p>Loading...</p>

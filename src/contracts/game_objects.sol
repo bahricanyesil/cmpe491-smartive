@@ -588,10 +588,10 @@ contract GameObjects is ERC1155, Ownable {
         lastUpdate = block.timestamp;
     }
 
-    function addNewGameItem(uint256 price, uint8 itemType, uint8 rareness, uint256 amount, string memory name,  string memory gameName) public onlyOwner {
+    function addNewGameItem(uint256 price, uint8 itemType, uint8 rareness, uint256 amount, string memory name, string memory gameName) public onlyOwner {
         require(itemType <= uint8(ItemType.OTHER), "Type of game item is out of range");
         require(rareness <= uint8(Rareness.OTHER), "Rareness of game item is out of range");
-        require(price >= 0, "Price must not be a negative number");
+        require(price >= 0, "Price should be greater than or equal to 0.");
         require(!isEmpty(name), "Name of game item must be entered");
         require(!isEmpty(gameName), "Name of game must be entered");
         for(uint256 i = 0; i < supplies.length; i++) {

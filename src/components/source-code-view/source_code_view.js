@@ -15,7 +15,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const SourceCodeView = ({ contractName, contractCode }) => {
+const SourceCodeView = ({ contractName, contractCode, completeContract }) => {
   const [compiledCode, setCompiledCode] = useState("");
   const [code, setCode] = useState(contractCode);
   const [open, setOpen] = useState(false);
@@ -74,28 +74,26 @@ const SourceCodeView = ({ contractName, contractCode }) => {
   };
 
   const compileCode = async () => {
+    const contractStart = completeContract.indexOf(`contract ${contractName}`);
+    const beforeContract = completeContract.substring(0, contractStart - 1);
+    const nameStart = contractCode.indexOf("contract") + 9;
+    const nameEnd = contractCode.indexOf("is");
+    const contractClassName = contractCode.substring(nameStart, nameEnd-1);
     setCompileLoading(true);
     try {
       const compiled = await solidityCompiler({
         version: `https://binaries.soliditylang.org/bin/soljson-v0.8.20+commit.a1b79de6.js`,
-        contractBody: contractCode,
+        contractBody: beforeContract + contractCode,
         options: { optimizer: { enabled: true, runs: 1000 } },
       });
-      console.log(compiled);
       if(compiled.errors) {
         console.log(compiled.errors);
         setDialogText("Error while compiling!");
         setOpen(true);
         return;
       }
-      const contractClassName = contractName.replace(
-        /\b(Contract|Code|Editor)\b/g,
-        ""
-      );
       const compiledContract =
-        compiled.contracts?.Compiled_Contracts?.[
-          contractClassName.replace(/\s/g, "")
-        ];
+        compiled.contracts?.Compiled_Contracts?.[contractClassName];
       setCompiledCode(compiledContract);
       setDialogText("Successfully Compiled!");
       setOpen(true);
@@ -125,7 +123,7 @@ const SourceCodeView = ({ contractName, contractCode }) => {
 
   const dialogError = dialogText.toLowerCase().includes('error');
 
-  return (
+  return (  
     <div data-color-mode="dark">
       <div
         style={{
@@ -134,7 +132,7 @@ const SourceCodeView = ({ contractName, contractCode }) => {
           marginBottom: "7px",
         }}
       >
-        <h4>{contractName}</h4>
+        <h4>{contractName} Contract Code Editor</h4>
         <div style={{ display: "flex", alignItems: "center" }}>
           <Button
             startIcon={<ContentCopyIcon />}

@@ -2,7 +2,7 @@ import Box from "@mui/material/Box";
 import Divider from "@mui/material/Divider";
 import FormGroup from "@mui/material/FormGroup";
 import TextField from "@mui/material/TextField";
-import React, { useEffect, useState } from "react";
+import { default as React, useEffect, useState } from "react";
 import CustomCheckbox from "../../components/checkbox/custom_checkbox";
 
 import SourceCodeView from "../../components/source-code-view/source_code_view";
@@ -10,6 +10,7 @@ import stadiumContract from "../../contracts/Stadium_Ticket.sol";
 
 const StadiumTicket = () => {
   const [contractCode, setContractCode] = useState(null);
+  const [completeContractCode, setCompleteContractCode] = useState("");
   const [contractName, setContractName] = useState("StadiumTicket");
   const [targetDirectionName, setTargetDirectionName] = useState("");
   const [matchDetailName, setMatchDetailName] = useState("");
@@ -97,20 +98,23 @@ const StadiumTicket = () => {
     fetch(stadiumContract)
       .then((r) => r.text())
       .then((text) => {
+        setCompleteContractCode(text);
+        const startIndex = text.indexOf("contract StadiumTicket");
+        text = text.substring(startIndex - 1);
         setContractCode(text);
         const allLines = text.split("\n");
         setBeforeLines([
-          allLines.slice(0, 9),
-          allLines.slice(10, 13),
-          allLines.slice(15, 18),
-          allLines.slice(19, 24),
-          allLines.slice(31, 35),
-          allLines.slice(43, 53),
-          allLines.slice(56, 63),
-          allLines.slice(64, 70),
-          allLines.slice(71, 83),
-          allLines.slice(91, 95),
-          allLines.slice(96),
+          allLines.slice(0, 9 - 8),
+          allLines.slice(10 - 8, 13 - 8),
+          allLines.slice(15 - 8, 18 - 8),
+          allLines.slice(19 - 8, 24 - 8),
+          allLines.slice(31 - 8, 35 - 8),
+          allLines.slice(43 - 8, 53 - 8),
+          allLines.slice(56 - 8, 63 - 8),
+          allLines.slice(64 - 8, 70 - 8),
+          allLines.slice(71 - 8, 83 - 8),
+          allLines.slice(91 - 8, 95 - 8),
+          allLines.slice(96 - 8),
         ]);
       });
   }, []);
@@ -254,8 +258,11 @@ const StadiumTicket = () => {
   };
 
   const targetNameChange = (event) => {
-    setContractName(event.target.value);
-    setNewContract(directionEnum, event.target.value, checked, contractURI);
+    const inputValue = event.target.value;
+    if (isNaN(inputValue)) {
+      setContractName(inputValue);
+      setNewContract(directionEnum, event.target.value, checked, contractURI);
+    }
   };
 
   const targetURIChange = (event) => {
@@ -307,7 +314,7 @@ const StadiumTicket = () => {
     newMatchStruct = matchStruct,
     newConstructorList = constructorList,
     newMatchList = matchDetails,
-    newCheckedList=matchDetailsCheck,
+    newCheckedList = matchDetailsCheck
   ) => {
     const hasDirection = directions !== "";
     let newLines = [];
@@ -406,7 +413,10 @@ const StadiumTicket = () => {
       if (!newCheckedList[i]) continue;
       entered = true;
       matchStruct.push(`        ${newMatchDetailTypes[i]} ${newMatchList[i]};`);
-      if (newMatchDetailTypes[i].includes("string") || newMatchDetailTypes[j].includes("[]")) {
+      if (
+        newMatchDetailTypes[i].includes("string") ||
+        newMatchDetailTypes[i].includes("[]")
+      ) {
         startString +=
           newMatchDetailTypes[i] + " memory " + newMatchList[i] + "_, ";
       } else {
@@ -472,8 +482,9 @@ const StadiumTicket = () => {
         {contractCode ? (
           <SourceCodeView
             key={contractCode}
-            contractName={"Stadium Ticket Contract Code Editor"}
+            contractName={"StadiumTicket"}
             contractCode={contractCode}
+            completeContract={completeContractCode}
           />
         ) : (
           <p>Loading...</p>

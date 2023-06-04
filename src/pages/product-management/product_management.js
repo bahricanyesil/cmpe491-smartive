@@ -10,6 +10,7 @@ import ProductManagementContract from '../../contracts/Product_Management.sol';
 
 const ProductManagement = () => {
   const [contractCode, setContractCode] = useState(null);
+  const [completeContractCode, setCompleteContractCode] = useState("");
   const [contractName, setContractName] = useState("ProductManagement");
   const [newProductType, setNewProductType] = useState("");
   const [newProductItemProperty, setNewProductItemProperty] = useState("");
@@ -51,16 +52,19 @@ const ProductManagement = () => {
     fetch(ProductManagementContract)
       .then((r) => r.text())
       .then((text) => {
+        setCompleteContractCode(text);
+        const startIndex = text.indexOf("contract ProductManagement");
+        text = text.substring(startIndex - 1);
         setContractCode(text);
         const allLines = text.split("\n");
         setBeforeLines([
-          allLines.slice(0, 8),
-          allLines.slice(9, 12),
-          allLines.slice(13, 19),
-          allLines.slice(21, 35),
-          allLines.slice(36, 39),
-          allLines.slice(50, 82),
-          allLines.slice(96),
+          allLines.slice(0, 8 - 7),
+          allLines.slice(9 - 7, 12 - 7),
+          allLines.slice(13 - 7, 19 - 7),
+          allLines.slice(21 - 7, 35 - 7),
+          allLines.slice(36 - 7, 39 - 7),
+          allLines.slice(50 - 7, 82 - 7),
+          allLines.slice(96 - 7),
         ]);
       });
   }, []);
@@ -87,8 +91,11 @@ const ProductManagement = () => {
   };
 
   const targetNameChange = (event) => {
-    setContractName(event.target.value);
-    setNewContract({newContractName: event.target.value});
+    const inputValue = event.target.value;
+    if (isNaN(inputValue)) {
+      setContractName(inputValue);
+      setNewContract({newContractName: event.target.value});
+    }
   };
 
   const targetURIChange = (event) => {
@@ -355,8 +362,9 @@ const ProductManagement = () => {
         {contractCode ? (
           <SourceCodeView
             key={contractCode}
-            contractName={"Product Management Contract Code Editor"}
+            contractName={"ProductManagement"}
             contractCode={contractCode}
+            completeContract={completeContractCode}
           />
         ) : (
           <p>Loading...</p>
