@@ -18,7 +18,12 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const SourceCodeView = ({ contractName, contractCode, completeContract }) => {
+const SourceCodeView = ({
+  contractName,
+  contractCode,
+  completeContract,
+  constructorParams,
+}) => {
   const [compiledCode, setCompiledCode] = useState("");
   const [deployedAddress, setDeployedAddress] = useState("");
   const [code, setCode] = useState(contractCode);
@@ -30,6 +35,12 @@ const SourceCodeView = ({ contractName, contractCode, completeContract }) => {
   const [dialogText, setDialogText] = useState("Successfully Copied!");
 
   const deployContract = async () => {
+    for(let i=0;i<constructorParams.length;i++){
+      if(constructorParams[i] == null || constructorParams[i].length===0){
+        alert("Please fill all the constructor parameters!");
+        return;
+      }
+    }
     if (window.web3) {
       const web3 = new Web3(window.web3.currentProvider);
       web3.eth.getAccounts(async function (error, accounts) {
@@ -48,7 +59,7 @@ const SourceCodeView = ({ contractName, contractCode, completeContract }) => {
         setDeployingContract(true);
         try {
           await contract
-            .deploy({ data: bytecode })
+            .deploy({ data: bytecode, arguments: constructorParams })
             .send({ from: accounts[0], gas: 3000000 })
             .on("confirmation", (confirmationNumber, receipt) => {
               if (confirmationNumber === 1) {
@@ -77,7 +88,9 @@ const SourceCodeView = ({ contractName, contractCode, completeContract }) => {
   };
 
   const copyAction = () => {
-    navigator.clipboard.writeText(contractCode);
+    const contractStart = completeContract.indexOf(`contract ${contractName}`);
+    const beforeContract = completeContract.substring(0, contractStart - 1);
+    navigator.clipboard.writeText(beforeContract + contractCode);
     setDialogText("Successfully Copied!");
     setOpen(true);
   };
