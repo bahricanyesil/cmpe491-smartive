@@ -16,6 +16,9 @@ const StadiumTicket = () => {
   const [matchDetailName, setMatchDetailName] = useState("");
   const [matchDetailType, setMatchDetailType] = useState("");
   const [contractURI, setContractURI] = useState("");
+  const [startDate, setStartDate] = useState(null);
+  const [homeTeam, setHomeTeam] = useState("");
+  const [awayTeam, setAwayTeam] = useState("");
   const [beforeLines, setBeforeLines] = useState([]);
   const [checkedDirections, setCheckedDirections] = React.useState([
     true,
@@ -118,6 +121,18 @@ const StadiumTicket = () => {
         ]);
       });
   }, []);
+
+  const newStartDateChange = (e) => {
+    setStartDate(e.target.value);
+  };
+
+  const homeTeamChange = (e) => {
+    setHomeTeam(e.target.value);
+  };
+
+  const awayTeamChange = (e) => {
+    setAwayTeam(e.target.value);
+  };
 
   const addDirection = (e) => {
     if (e.key == "Enter" && targetDirectionName.length > 0) {
@@ -485,6 +500,11 @@ const StadiumTicket = () => {
             contractName={"StadiumTicket"}
             contractCode={contractCode}
             completeContract={completeContractCode}
+            constructorParams={[
+              homeTeam,
+              awayTeam,
+              new Date(startDate).getTime() / 1000,
+            ]}
           />
         ) : (
           <p>Loading...</p>
@@ -561,7 +581,7 @@ const StadiumTicket = () => {
             />
           </FormGroup>
         </div>
-        <div style={{ padding: "16px 24px", color: "#44596e" }}>
+        {/* <div style={{ padding: "16px 24px", color: "#44596e" }}>
           <h5>Include Match Event</h5>
           <FormGroup>
             <CustomCheckbox label="Match Event" onChange={handleChange1} />
@@ -595,6 +615,52 @@ const StadiumTicket = () => {
                 value={matchDetailType}
                 defaultValue=""
                 onKeyDown={addMatchDetail}
+              />
+            </div>
+          </Box>
+        </div> */}
+        <div style={{ marginTop: "10px", color: "#44596e" }}>
+          <FormGroup>
+            <Divider
+              style={{ marginTop: "10px", marginBottom: "8px" }}
+              spacing={1}
+            >
+              Construction Parameters
+            </Divider>
+          </FormGroup>
+          <Box
+            component="form"
+            sx={{
+              "& .MuiTextField-root": { m: 1, width: "25ch" },
+            }}
+            noValidate
+            autoComplete="off"
+          >
+            <div style={{ marginTop: "15px", marginBottom: "15px" }}>
+              <label style={{ marginRight: "8px" }} htmlFor="dateInput">
+                Select a Start Date:{" "}
+              </label>
+              <input
+                type="date"
+                id="startDateInput"
+                value={startDate}
+                onChange={newStartDateChange}
+              />
+            </div>
+            <div style={{ marginTop: "15px" }}>
+              <TextField
+                required
+                onChange={homeTeamChange}
+                id="outlined-required"
+                label="Home Team"
+              />
+            </div>
+            <div style={{ marginTop: "15px" }}>
+              <TextField
+                required
+                onChange={awayTeamChange}
+                id="outlined-required"
+                label="Away Team"
               />
             </div>
           </Box>

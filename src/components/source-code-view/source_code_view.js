@@ -1,10 +1,13 @@
+import AssignmentIcon from "@mui/icons-material/Assignment";
 import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import CodeIcon from "@mui/icons-material/Code";
 import ConstructionIcon from "@mui/icons-material/Construction";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import LocationOnIcon from "@mui/icons-material/LocationOn";
 import MuiAlert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
-import { green, pink, yellow } from "@mui/material/colors";
+import { amber, deepOrange, green, pink, teal } from "@mui/material/colors";
 import CodeEditor from "@uiw/react-textarea-code-editor";
 import React, { useState } from "react";
 import Web3 from "web3";
@@ -15,16 +18,30 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const SourceCodeView = ({ contractName, contractCode, completeContract }) => {
+const SourceCodeView = ({
+  contractName,
+  contractCode,
+  completeContract,
+  constructorParams,
+}) => {
   const [compiledCode, setCompiledCode] = useState("");
+  const [deployedAddress, setDeployedAddress] = useState("");
   const [code, setCode] = useState(contractCode);
   const [open, setOpen] = useState(false);
+  const [deployingContract, setDeployingContract] = useState(false);
   const [userAddress, setUserAddress] = useState([]);
   const [compileLoading, setCompileLoading] = useState(false);
   const [deployLoading, setDeployLoading] = useState(false);
   const [dialogText, setDialogText] = useState("Successfully Copied!");
 
   const deployContract = async () => {
+    for(let i=0;i<constructorParams.length;i++){
+      if(constructorParams[i] == null || constructorParams[i].length===0){
+        console.log(constructorParams)
+        alert("Please fill all the constructor parameters!");
+        return;
+      }
+    }
     if (window.web3) {
       const web3 = new Web3(window.web3.currentProvider);
       web3.eth.getAccounts(async function (error, accounts) {
@@ -40,9 +57,10 @@ const SourceCodeView = ({ contractName, contractCode, completeContract }) => {
         }
         const bytecode = compiledCode.evm?.bytecode?.object;
         const contract = new web3.eth.Contract(compiledCode.abi);
+        setDeployingContract(true);
         try {
           await contract
-            .deploy({ data: bytecode })
+            .deploy({ data: bytecode, arguments: constructorParams })
             .send({ from: accounts[0], gas: 3000000 })
             .on("confirmation", (confirmationNumber, receipt) => {
               if (confirmationNumber === 1) {
@@ -50,6 +68,7 @@ const SourceCodeView = ({ contractName, contractCode, completeContract }) => {
                   "Contract deployed at address:",
                   receipt.contractAddress
                 );
+                setDeployedAddress(receipt.contractAddress);
                 setDialogText("Contract Deployed!");
                 setOpen(true);
                 setUserAddress([window.ethereum.selectedAddress]);
@@ -58,6 +77,8 @@ const SourceCodeView = ({ contractName, contractCode, completeContract }) => {
         } catch (error) {
           console.log("Error:", error);
           console.log(error);
+        } finally {
+          setDeployingContract(false);
         }
       });
     } else {
@@ -68,7 +89,9 @@ const SourceCodeView = ({ contractName, contractCode, completeContract }) => {
   };
 
   const copyAction = () => {
-    navigator.clipboard.writeText(contractCode);
+    const contractStart = completeContract.indexOf(`contract ${contractName}`);
+    const beforeContract = completeContract.substring(0, contractStart - 1);
+    navigator.clipboard.writeText(beforeContract + contractCode);
     setDialogText("Successfully Copied!");
     setOpen(true);
   };
@@ -78,7 +101,7 @@ const SourceCodeView = ({ contractName, contractCode, completeContract }) => {
     const beforeContract = completeContract.substring(0, contractStart - 1);
     const nameStart = contractCode.indexOf("contract") + 9;
     const nameEnd = contractCode.indexOf("is");
-    const contractClassName = contractCode.substring(nameStart, nameEnd-1);
+    const contractClassName = contractCode.substring(nameStart, nameEnd - 1);
     setCompileLoading(true);
     try {
       const compiled = await solidityCompiler({
@@ -86,7 +109,7 @@ const SourceCodeView = ({ contractName, contractCode, completeContract }) => {
         contractBody: beforeContract + contractCode,
         options: { optimizer: { enabled: true, runs: 1000 } },
       });
-      if(compiled.errors) {
+      if (compiled.errors) {
         console.log(compiled.errors);
         setDialogText("Error while compiling!");
         setOpen(true);
@@ -110,6 +133,7 @@ const SourceCodeView = ({ contractName, contractCode, completeContract }) => {
     setDialogText("Successfully Copied Byte Code!");
     setOpen(true);
   };
+
   const copyABI = () => {
     const formattedABI = JSON.stringify(compiledCode.abi, null, "\t");
     navigator.clipboard.writeText(formattedABI);
@@ -117,13 +141,19 @@ const SourceCodeView = ({ contractName, contractCode, completeContract }) => {
     setOpen(true);
   };
 
+  const copyDeployedContractAddress = () => {
+    navigator.clipboard.writeText(deployedAddress);
+    setDialogText("Successfully Copied Deployed Contract Address!");
+    setOpen(true);
+  };
+
   const handleClose = (event) => {
     setOpen(false);
   };
 
-  const dialogError = dialogText.toLowerCase().includes('error');
+  const dialogError = dialogText.toLowerCase().includes("error");
 
-  return (  
+  return (
     <div data-color-mode="dark">
       <div
         style={{
@@ -171,26 +201,43 @@ const SourceCodeView = ({ contractName, contractCode, completeContract }) => {
         autoHideDuration={2000}
         onClose={handleClose}
       >
-        <Alert onClose={handleClose} severity={dialogError ? "error" : "success"} sx={{ width: "300%" }}>
+        <Alert
+          onClose={handleClose}
+          severity={dialogError ? "error" : "success"}
+          sx={{ width: "300%" }}
+        >
           {dialogText}
         </Alert>
       </Snackbar>
       {compiledCode ? (
-        <div style={{ marginBottom: "15px" }}>
+        <div style={{ marginBottom: "15px", marginTop: "15px" }}>
+          {deployedAddress || deployingContract ? (
+            <Button
+              startIcon={<LocationOnIcon />}
+              onClick={copyDeployedContractAddress}
+              style={{ marginLeft: "5px" }}
+              sx={{ backgroundColor: teal[500], color: "#fff" }}
+              variant="contained"
+            >
+              {deployingContract ? "Loading..." : "Copy Contract Address"}
+            </Button>
+          ) : (
+            <div></div>
+          )}
           <Button
-            startIcon={<ConstructionIcon />}
+            startIcon={<AssignmentIcon />}
             onClick={copyABI}
             style={{ marginLeft: "5px" }}
-            sx={{ backgroundColor: yellow[900] }}
+            sx={{ backgroundColor: amber[500], color: "#fff" }}
             variant="contained"
           >
             Copy ABI
           </Button>
           <Button
-            startIcon={<ConstructionIcon />}
+            startIcon={<CodeIcon />}
             onClick={copyByteCode}
             style={{ marginLeft: "5px" }}
-            sx={{ backgroundColor: yellow[900] }}
+            sx={{ backgroundColor: deepOrange[500], color: "#fff" }}
             variant="contained"
           >
             Copy ByteCode
