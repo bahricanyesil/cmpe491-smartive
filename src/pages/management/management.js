@@ -1,4 +1,4 @@
-import { Button, List, ListItem, ListItemText, TextField, Typography } from '@material-ui/core';
+import { Button, List, ListItem, ListItemText, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react';
 import Web3 from 'web3';
 
