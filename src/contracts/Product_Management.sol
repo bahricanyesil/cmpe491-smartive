@@ -559,7 +559,7 @@ contract ProductManagement is ERC1155, Ownable {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIdCounter;
 
-    enum ProductType {FOOD, FURNITURE, JEWELRY, HOUSEHOLD ELECTRICAL APPLIANCES, RAW MATERIAL, CLOTHING, OTHER}
+    enum ProductType {FOOD, FURNITURE, JEWELRY, HOUSEHOLD_ELECTRICAL_APPLIANCES, RAW_MATERIAL, CLOTHING, OTHER}
 
     struct ProductItem {
         uint256 tokenId;
@@ -619,7 +619,7 @@ contract ProductManagement is ERC1155, Ownable {
         return productItems[_productItemId].numberOfSales;
     }
 
-    function getProductItemById(uint256 _productItemId) private view returns(Product memory productItem) {
+    function getProductItemById(uint256 _productItemId) private view returns(ProductItem memory productItem) {
         require(_productItemId <= supplies.length - 1, "The product item couldn't be found.");
         return productItems[_productItemId];
     }

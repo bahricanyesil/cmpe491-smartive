@@ -1576,7 +1576,7 @@ contract NumberedEventTicket is ERC721, Pausable, Ownable {
         return cellItems;
     }
 
-    function addBlock(uint256 price, uint256 totalRowNumber_ string memory name) public onlyOwner {
+    function addBlock(uint256 price, uint256 totalRowNumber_, string memory name) public onlyOwner {
         require(!checkEventPassed(), "Event has already occurred.");
         require(price >= 0, "Price should be greater than or equal to 0.");
         require(totalRowNumber_ > 0, "The block has to have at least 1 row.");

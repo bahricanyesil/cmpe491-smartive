@@ -21,8 +21,8 @@ const ProductManagement = () => {
     "FOOD",
     "FURNITURE", 
     "JEWELRY", 
-    "HOUSEHOLD ELECTRICAL APPLIANCES", 
-    "RAW MATERIAL", 
+    "HOUSEHOLD_ELECTRICAL_APPLIANCES", 
+    "RAW_MATERIAL", 
     "CLOTHING", 
     "OTHER"
   ]);
