@@ -35,11 +35,12 @@ const SourceCodeView = ({
   const [dialogText, setDialogText] = useState("Successfully Copied!");
 
   const deployContract = async () => {
-    for(let i=0;i<constructorParams.length;i++){
-      if(constructorParams[i] == null || constructorParams[i].length===0){
-        console.log(constructorParams)
-        alert("Please fill all the constructor parameters!");
-        return;
+    if(constructorParams) {
+      for(let i=0;i<constructorParams.length;i++){
+        if(!constructorParams[i] || constructorParams[i].length===0){
+          alert("Please fill all the constructor parameters!");
+          return;
+        }
       }
     }
     if (window.web3) {
@@ -60,7 +61,7 @@ const SourceCodeView = ({
         setDeployingContract(true);
         try {
           await contract
-            .deploy({ data: bytecode, arguments: constructorParams })
+            .deploy({ data: bytecode, arguments: constructorParams ? constructorParams : [] })
             .send({ from: accounts[0], gas: 3000000 })
             .on("confirmation", (confirmationNumber, receipt) => {
               if (confirmationNumber === 1) {
