@@ -1,17 +1,23 @@
 import AssignmentIcon from "@mui/icons-material/Assignment";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
 import CodeIcon from "@mui/icons-material/Code";
 import ConstructionIcon from "@mui/icons-material/Construction";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import ExploreIcon from "@mui/icons-material/Explore";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import MuiAlert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
-import { amber, deepOrange, green, pink, teal } from "@mui/material/colors";
+import { amber, deepOrange, green, teal } from "@mui/material/colors";
+import HDWalletProvider from "@truffle/hdwallet-provider";
 import CodeEditor from "@uiw/react-textarea-code-editor";
 import React, { useState } from "react";
 import Web3 from "web3";
 import { solidityCompiler } from "../../utils/solidity/index.js";
+import AvalancheIcon from "../assets/avalanche.png";
+import BloxbergIcon from "../assets/bloxberg.png";
+import EthereumIcon from "../assets/ethereum.png";
+import PolygonIcon from "../assets/polygon.png";
+import DropdownMenuButton from "../dropdown-menu/dropdown_menu_button.js";
 import "./source_code_view.css";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -24,44 +30,68 @@ const SourceCodeView = ({
   completeContract,
   constructorParams,
 }) => {
+  const [selectedChain, setSelectedChain] = useState("");
   const [compiledCode, setCompiledCode] = useState("");
   const [deployedAddress, setDeployedAddress] = useState("");
+  const [transactionHash, setTransactionHash] = useState("");
   const [code, setCode] = useState(contractCode);
   const [open, setOpen] = useState(false);
   const [deployingContract, setDeployingContract] = useState(false);
   const [userAddress, setUserAddress] = useState([]);
   const [compileLoading, setCompileLoading] = useState(false);
-  const [deployLoading, setDeployLoading] = useState(false);
   const [dialogText, setDialogText] = useState("Successfully Copied!");
+  const blockchains = ["Ethereum", "Polygon", "Avalanche", "Bloxberg"];
+  const blockchainRPCs = [
+    "",
+    "https://rpc-mumbai.maticvigil.com/",
+    "https://api.avax-test.network/ext/bc/C/rpc",
+    "https://core.bloxberg.org",
+  ];
+  const explorers = [
+    "https://sepolia.etherscan.io/tx/",
+    "https://mumbai.polygonscan.com/tx/",
+    "https://testnet.snowtrace.io/tx/",
+    "https://blockexplorer.bloxberg.org/tx/",
+  ];
 
-  const deployContract = async () => {
-    if(constructorParams) {
-      for(let i=0;i<constructorParams.length;i++){
-        if(!constructorParams[i] || constructorParams[i].length===0){
+  const deployContract = async (newSelectedChain) => {
+    if (constructorParams) {
+      for (let i = 0; i < constructorParams.length; i++) {
+        if (!constructorParams[i] || constructorParams[i].length === 0) {
           alert("Please fill all the constructor parameters!");
           return;
         }
       }
     }
     if (window.web3) {
-      const web3 = new Web3(window.web3.currentProvider);
+      let rpcURL = "";
+      if (newSelectedChain !== "Ethereum") {
+        rpcURL = blockchainRPCs[blockchains.indexOf(newSelectedChain)];
+      }
+      let provider = window.web3.currentProvider;
+      if (rpcURL && rpcURL.length > 0) {
+        const mnemonic = process.env.REACT_APP_MNEMONIC;
+        provider = new HDWalletProvider(mnemonic.toString(), rpcURL);
+      } else {
+        await switchToEthereum();
+      }
+      const web3 = new Web3(provider);
+
       web3.eth.getAccounts(async function (error, accounts) {
         if (accounts.length === 0) {
           alert("Please connect your wallet to use your account!");
+          return;
         }
         setUserAddress(accounts);
-        const enabled = accounts.length > 0;
-        if (window.ethereum && accounts.length === 0) {
-          window.ethereum.enable().then(() => {
-            enabled = true;
-          });
-        }
         const bytecode = compiledCode.evm?.bytecode?.object;
         const contract = new web3.eth.Contract(compiledCode.abi);
         setDeployingContract(true);
         try {
           await contract
-            .deploy({ data: bytecode, arguments: constructorParams ? constructorParams : [] })
+            .deploy({
+              data: "0x" + bytecode,
+              arguments: constructorParams ? constructorParams : [],
+            })
             .send({ from: accounts[0], gas: 3000000 })
             .on("confirmation", (confirmationNumber, receipt) => {
               if (confirmationNumber === 1) {
@@ -69,23 +99,48 @@ const SourceCodeView = ({
                   "Contract deployed at address:",
                   receipt.contractAddress
                 );
+                console.log(
+                  "Transaction hash:",
+                  receipt.transactionHash
+                );
                 setDeployedAddress(receipt.contractAddress);
+                setTransactionHash(receipt.transactionHash);
                 setDialogText("Contract Deployed!");
                 setOpen(true);
                 setUserAddress([window.ethereum.selectedAddress]);
+                setDeployingContract(false);
               }
             });
         } catch (error) {
-          console.log("Error:", error);
           console.log(error);
-        } finally {
           setDeployingContract(false);
+          alert(`Error deploying contract!\n\n${error}`);
         }
       });
     } else {
       console.log(
         "Non-Ethereum browser detected. You should consider trying MetaMask!"
       );
+    }
+  };
+
+  const switchToEthereum = async () => {
+    if (window.ethereum) {
+      try {
+        await window.ethereum.enable();
+        const web3 = new Web3(window.ethereum);
+        const currentChainId = await web3.eth.getChainId();
+        if (currentChainId !== "11155111") {
+          await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: "0xAA36A7" }],
+          });
+        }
+      } catch (error) {
+        console.error("Error switching to Ethereum:", error);
+      }
+    } else {
+      console.error("MetaMask not detected.");
     }
   };
 
@@ -106,7 +161,7 @@ const SourceCodeView = ({
     setCompileLoading(true);
     try {
       const compiled = await solidityCompiler({
-        version: `https://binaries.soliditylang.org/bin/soljson-v0.8.20+commit.a1b79de6.js`,
+        version: `https://binaries.soliditylang.org/bin/soljson-v0.8.17+commit.8df45f5f.js`,
         contractBody: beforeContract + contractCode,
         options: { optimizer: { enabled: true, runs: 1000 } },
       });
@@ -127,6 +182,17 @@ const SourceCodeView = ({
     } finally {
       setCompileLoading(false);
     }
+  };
+
+  const openExplorer = () => {
+    const explorerURL = explorers[blockchains.indexOf(selectedChain)];
+    window.open(explorerURL + transactionHash, "_blank");
+  };
+
+  const handleBlockchainChange = (selectedIndex) => {
+    const newSelectedChain = blockchains[selectedIndex];
+    setSelectedChain(newSelectedChain);
+    deployContract(newSelectedChain);
   };
 
   const copyByteCode = () => {
@@ -182,15 +248,22 @@ const SourceCodeView = ({
             {compileLoading ? "Compiling..." : "Compile"}
           </Button>
           {compiledCode ? (
-            <Button
-              startIcon={<CloudUploadIcon />}
-              style={{ marginLeft: "5px" }}
-              sx={{ backgroundColor: pink[700] }}
-              onClick={deployContract}
-              variant="contained"
-            >
-              Deploy
-            </Button>
+            <DropdownMenuButton
+              divStyle={{ marginLeft: "5px" }}
+              icons={[
+                <img src={EthereumIcon} alt="Ethereum" height={"25px"} />,
+                <img src={PolygonIcon} alt="Polygon" height={"25px"} />,
+                <img src={AvalancheIcon} alt="Avalanche" height={"25px"} />,
+                <img src={BloxbergIcon} alt="Bloxberg" height={"25px"} />,
+              ]}
+              handleBlockchainChange={handleBlockchainChange}
+              texts={["Ethereum", "Polygon", "Avalanche", ""]}
+              buttonText={
+                deployingContract
+                  ? `Deploying to ${selectedChain}...`
+                  : "Deploy"
+              }
+            ></DropdownMenuButton>
           ) : (
             <div></div>
           )}
@@ -243,6 +316,25 @@ const SourceCodeView = ({
           >
             Copy ByteCode
           </Button>
+        </div>
+      ) : (
+        <div></div>
+      )}{" "}
+      {compiledCode ? (
+        <div style={{ marginBottom: "15px", marginTop: "15px" }}>
+          {(deployedAddress && !deployingContract) ? (
+            <Button
+              startIcon={<ExploreIcon />}
+              onClick={openExplorer}
+              style={{ marginLeft: "5px" }}
+              sx={{ backgroundColor: "teal", color: "#fff" }}
+              variant="contained"
+            >
+              Open Explorer
+            </Button>
+          ) : (
+            <div></div>
+          )}
         </div>
       ) : (
         <div></div>
