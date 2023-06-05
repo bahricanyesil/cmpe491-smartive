@@ -9,6 +9,7 @@ import Clothing from './pages/clothing/clothing';
 import GameObjects from './pages/game-objects/game_objects';
 import HomePage from './pages/home-page/home_page';
 import Insurance from './pages/insurance/insurance';
+import Management from './pages/management/management';
 import NumberedEventTicket from './pages/numbered-event-ticket/numbered_event_ticket';
 import ProductManagement from './pages/product-management/product_management';
 import StadiumTicket from './pages/stadium-ticket-page/stadium_ticket';
@@ -16,10 +17,8 @@ import TimeSlot from './pages/time-slot/time_slot';
 import TravelTicket from './pages/travel-ticket/travel_ticket';
 import UnNumberedEventTicket from './pages/unnumbered-event-ticket/unnumbered_event_ticket';
 import WeightedMultipleVoting from './pages/weighted-multiple-voting/weighted_multiple_voting';
-import Management from './pages/management/management';
 
 const App = () => {
-  
   return (
     <div>
       <Router>
