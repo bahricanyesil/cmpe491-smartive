@@ -13,6 +13,11 @@ const NumberedEventTicket = () => {
   const [completeContractCode, setCompleteContractCode] = useState("");
   const [contractName, setContractName] = useState("NumberedTicket");
   const [contractURI, setContractURI] = useState("");
+  const [startDate, setStartDate] = useState(null);
+  const [locationName, setLocationName] = useState("");
+  const [websiteUrl, setWebsiteUrl] = useState("");
+  const [eventName, setEventName] = useState("");
+  const [duration, setDuration] = useState(null);
   const [beforeLines, setBeforeLines] = useState([]);
   const [eventDetailItems, setEventDetailItems] = React.useState([
     "startDate",
@@ -206,7 +211,22 @@ const NumberedEventTicket = () => {
     }
     setContractCode(newLines.join("\n"));
   };
+  const startDateChange = (e) => {
+    setStartDate(e.target.value);
+  };
 
+  const locationNameChange = (e) => {
+    setLocationName(e.target.value);
+  };
+  const websiteUrlChange = (e) => {
+    setWebsiteUrl(e.target.value);
+  };
+  const eventNameChange = (e) => {
+    setEventName(e.target.value);
+  };
+  const durationChange = (e) => {
+    setDuration(e.target.value);
+  };
   const targetNameChange = (event) => {
     const inputValue = event.target.value;
     if (isNaN(inputValue)) {
@@ -417,6 +437,14 @@ const NumberedEventTicket = () => {
             contractName={"NumberedEventTicket"}
             contractCode={contractCode}
             completeContract={completeContractCode}
+            constructorParams={[
+              new Date(startDate).getTime() / 1000,
+              locationName,
+              websiteUrl,
+              eventName,
+              (new Date(duration).getTime() / 1000) - (new Date(startDate).getTime() / 1000),
+              
+            ]}
           />
         ) : (
           <p>Loading...</p>
@@ -552,6 +580,80 @@ const NumberedEventTicket = () => {
             </div>
           </Box>
         </div>
+
+        <div style={{ marginTop: "10px", color: "#44596e" }}>
+          <FormGroup>
+            <Divider
+              style={{ marginTop: "10px", marginBottom: "8px" }}
+              spacing={1}
+            >
+              Construction Parameters
+            </Divider>
+          </FormGroup>
+          <Box
+            component="form"
+            sx={{
+              "& .MuiTextField-root": { m: 1, width: "25ch" },
+            }}
+            noValidate
+            autoComplete="off"
+          >
+            
+            <div style={{ marginTop: "15px", marginBottom: "15px" }}>
+              <label style={{ marginRight: "8px" }} htmlFor="dateInput">
+                Select a Start Date:{" "}
+              </label>
+              <input
+                type="date"
+                id="startDateInput"
+                value={startDate}
+                onChange={startDateChange}
+              />
+            </div>
+            <div style={{ marginTop: "15px" }}>
+              <TextField
+                required
+                onChange={locationNameChange}
+                id="outlined-required"
+                label="Location Name"
+              />
+            </div>
+
+            <div style={{ marginTop: "15px" }}>
+              <TextField
+                required
+                onChange={websiteUrlChange}
+                id="outlined-required"
+                label="Website Url"
+              />
+            </div>
+            <div style={{ marginTop: "15px" }}>
+              <TextField
+                required
+                onChange={eventNameChange}
+                id="outlined-required"
+                label="Event Name"
+              />
+            </div>
+            <div style={{ marginTop: "15px", marginBottom: "15px" }}>
+              <label style={{ marginRight: "8px" }} htmlFor="dateInput">
+                Select a End Date:{" "}
+              </label>
+              <input
+                type="date"
+                id="endDateInput"
+                value={duration}
+                onChange={durationChange}
+              />
+            </div>
+
+
+          </Box>
+        </div>
+
+
+
+
       </div>
     </div>
   );
