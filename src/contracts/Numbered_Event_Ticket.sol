@@ -1544,8 +1544,8 @@ contract NumberedEventTicket is ERC721, Pausable, Ownable {
     uint256[] seatBlockList;
 
     constructor(uint256 startDate_, string memory locationName_, string memory websiteUrl_, string memory eventName_, uint256 duration_) ERC721("EventTicketToken", "EveT") {
-        require(startDate_ > block.timestamp, "You can not set start time of the match to a past date.");
-        require(duration_ > 0, "The duration should be greater than 0.");
+        require(startDate_ > block.timestamp);
+        require(duration_ > 0);
         eventDetails = EventDetails(
             startDate_,
             locationName_,
@@ -1560,15 +1560,15 @@ contract NumberedEventTicket is ERC721, Pausable, Ownable {
     }
 
     function getRowsInBlock(uint256 blockId) public view returns(uint256[] memory items) {
-        require(supplies.length > 0, "There is no block to buy ticket");
-        require(seatBlocks[blockId].totalRowNumber > 0, "There is no block with the given block id.");
+        require(supplies.length > 0);
+        require(seatBlocks[blockId].totalRowNumber > 0);
         return seatBlocks[blockId].rowIds;
     }
 
     function getCellsinRow(uint256 blockId, uint256 rowId) public view returns(uint256[] memory items) {
         require(supplies.length > 0, "There is no block to buy ticket");
-        require(seatBlocks[blockId].totalRowNumber > 0, "There is no block with the given block id.");
-        require(seatBlocks[blockId].seatRows[rowId].totalCapacity > 0, "There is no row with the given row id.");
+        require(seatBlocks[blockId].totalRowNumber > 0);
+        require(seatBlocks[blockId].seatRows[rowId].totalCapacity > 0);
         uint256[] memory cellItems = new uint256[](seatBlocks[blockId].seatRows[rowId].totalCapacity);
         for(uint256 i=0; i<seatBlocks[blockId].seatRows[rowId].totalCapacity; i++) {
             cellItems[i] = seatBlocks[blockId].seatRows[rowId].firstCellId+i;
@@ -1577,11 +1577,11 @@ contract NumberedEventTicket is ERC721, Pausable, Ownable {
     }
 
     function addBlock(uint256 price, uint256 totalRowNumber_, string memory name) public onlyOwner {
-        require(!checkEventPassed(), "Event has already occurred.");
-        require(price >= 0, "Price should be greater than or equal to 0.");
-        require(totalRowNumber_ > 0, "The block has to have at least 1 row.");
+        require(!checkEventPassed());
+        require(price >= 0);
+        require(totalRowNumber_ > 0);
         for(uint256 i=0; i<supplies.length; i++) {
-            require(!compareStrings(seatBlocks[i].name, name), "There is already a block with the same name.");
+            require(!compareStrings(seatBlocks[i].name, name));
         }
         uint256 blockId = _blockIdCounter.current();
         _blockIdCounter.increment();
@@ -1596,23 +1596,23 @@ contract NumberedEventTicket is ERC721, Pausable, Ownable {
     }
 
      function buyTicket(uint256 blockId, uint256 rowId, uint256 cellId) public payable {
-        require(!checkEventPassed(), "Event has already occurred.");
-        require(supplies.length > 0, "There is no block to buy ticket");
-        require(seatBlocks[blockId].totalRowNumber > 0, "There is no block with the given block id.");
-        require(seatBlocks[blockId].seatRows[rowId].totalCapacity > 0, "There is no row with the given row id.");
-        require(cellId < seatBlocks[blockId].seatRows[rowId].totalCapacity, "Seat number is the greater than the last seat in this row.");
-        require(cellId >= 0, "Seat number is the less than the first seat in this row.");
+        require(!checkEventPassed());
+        require(supplies.length > 0);
+        require(seatBlocks[blockId].totalRowNumber > 0);
+        require(seatBlocks[blockId].seatRows[rowId].totalCapacity > 0);
+        require(cellId < seatBlocks[blockId].seatRows[rowId].totalCapacity);
+        require(cellId >= 0);
         uint256 tokenId = cellId + seatBlocks[blockId].seatRows[rowId].firstCellId;
-        require(!seatBlocks[blockId].seatRows[rowId].cells[tokenId], "The seat has already sold.");
+        require(!seatBlocks[blockId].seatRows[rowId].cells[tokenId]);
         require(msg.value >= seatBlocks[blockId].price, "You don't have enough price.");
         _safeMint(msg.sender, tokenId);
         seatBlocks[blockId].seatRows[rowId].cells[tokenId] = true;
     }
 
     function addBlockRow(uint256 blockId, uint256 capacity_) public onlyOwner {
-        require(blockId >= 0, "Block id should be grater than or equal to 0.");
-        require(seatBlocks[blockId].totalRowNumber > 0, "There is no block with the given block id.");
-        require(seatBlocks[blockId].createdRowNumber < seatBlocks[blockId].totalRowNumber, "This block has maximum rows entered.");
+        require(blockId >= 0);
+        require(seatBlocks[blockId].totalRowNumber > 0);
+        require(seatBlocks[blockId].createdRowNumber < seatBlocks[blockId].totalRowNumber);
         require(capacity_ > 0, "A row should have more than 0 capacity.");
         uint256 rowId = _rowIdCounter.current();
         _rowIdCounter.increment();
