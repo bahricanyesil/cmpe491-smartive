@@ -4,13 +4,14 @@ import ConstructionIcon from "@mui/icons-material/Construction";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ExploreIcon from "@mui/icons-material/Explore";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
+import { TextField } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
 import { amber, deepOrange, green, teal } from "@mui/material/colors";
 import HDWalletProvider from "@truffle/hdwallet-provider";
 import CodeEditor from "@uiw/react-textarea-code-editor";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Web3 from "web3";
 import { solidityCompiler } from "../../utils/solidity/index.js";
 import AvalancheIcon from "../assets/avalanche.png";
@@ -39,6 +40,7 @@ const SourceCodeView = ({
   const [deployingContract, setDeployingContract] = useState(false);
   const [userAddress, setUserAddress] = useState([]);
   const [compileLoading, setCompileLoading] = useState(false);
+  const [privateKey, setPrivateKey] = useState("");
   const [dialogText, setDialogText] = useState("Successfully Copied!");
   const blockchains = ["Ethereum", "Polygon", "Avalanche", "Bloxberg"];
   const blockchainRPCs = [
@@ -54,7 +56,20 @@ const SourceCodeView = ({
     "https://blockexplorer.bloxberg.org/tx/",
   ];
 
+  // Load the cached value on component mount
+  useEffect(() => {
+    const cachedValue = localStorage.getItem('privateKey');
+    if (cachedValue) {
+      setPrivateKey(cachedValue);
+    }
+  }, []);
+
+
   const deployContract = async (newSelectedChain) => {
+    if ((!privateKey || privateKey.length === 0) && newSelectedChain !== "Ethereum") {
+      alert("Please enter your private key from Metamask to deploy!");
+      return;
+    }
     if (constructorParams) {
       for (let i = 0; i < constructorParams.length; i++) {
         if (!constructorParams[i] || constructorParams[i].length === 0) {
@@ -70,8 +85,7 @@ const SourceCodeView = ({
       }
       let provider = window.web3.currentProvider;
       if (rpcURL && rpcURL.length > 0) {
-        const mnemonic = process.env.REACT_APP_MNEMONIC;
-        provider = new HDWalletProvider(mnemonic.toString(), rpcURL);
+        provider = new HDWalletProvider([privateKey], rpcURL);
       } else {
         await switchToEthereum();
       }
@@ -99,10 +113,7 @@ const SourceCodeView = ({
                   "Contract deployed at address:",
                   receipt.contractAddress
                 );
-                console.log(
-                  "Transaction hash:",
-                  receipt.transactionHash
-                );
+                console.log("Transaction hash:", receipt.transactionHash);
                 setDeployedAddress(receipt.contractAddress);
                 setTransactionHash(receipt.transactionHash);
                 setDialogText("Contract Deployed!");
@@ -114,7 +125,7 @@ const SourceCodeView = ({
         } catch (error) {
           console.log(error);
           setDeployingContract(false);
-          alert(`Error deploying contract!\n\n${error}`);
+          alert(`Error deploying contract!\n\n${error['message'].toString()}`);
         }
       });
     } else {
@@ -151,6 +162,12 @@ const SourceCodeView = ({
     setDialogText("Successfully Copied!");
     setOpen(true);
   };
+
+  const privateKeyChange = (event) => {
+    const input = event.target.value;
+    setPrivateKey(input);
+    localStorage.setItem('privateKey', input);
+  }
 
   const compileCode = async () => {
     const contractStart = completeContract.indexOf(`contract ${contractName}`);
@@ -219,6 +236,7 @@ const SourceCodeView = ({
   };
 
   const dialogError = dialogText.toLowerCase().includes("error");
+  const maskedPrivateKey = "*".repeat(privateKey.length);
 
   return (
     <div data-color-mode="dark">
@@ -267,6 +285,23 @@ const SourceCodeView = ({
           ) : (
             <div></div>
           )}
+        </div>
+      </div>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          marginBottom: "7px",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center" }}>
+          <TextField
+            required
+            onChange={privateKeyChange}
+            id="outlined-required"
+            label="Private Key"
+            value={maskedPrivateKey}
+          />
         </div>
       </div>
       <Snackbar
@@ -322,7 +357,7 @@ const SourceCodeView = ({
       )}{" "}
       {compiledCode ? (
         <div style={{ marginBottom: "15px", marginTop: "15px" }}>
-          {(deployedAddress && !deployingContract) ? (
+          {deployedAddress && !deployingContract ? (
             <Button
               startIcon={<ExploreIcon />}
               onClick={openExplorer}
