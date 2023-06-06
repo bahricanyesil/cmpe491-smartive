@@ -406,7 +406,7 @@ const NumberedEventTicket = () => {
         onChange={(event) => checkCategoryItem(event.target.checked, i)}
       />
     );
-  }
+  } 
 
   return (
     <div style={{ display: "flex", height: "100%", direction: "ltr" }}>
