@@ -9,6 +9,7 @@ import LocalGasStationIcon from '@mui/icons-material/LocalGasStation';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import LinkIcon from '@mui/icons-material/Link';
 import React, { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import Web3 from 'web3';
 
 const Alert = React.forwardRef(function Alert(props, ref) {
@@ -112,9 +113,9 @@ const TransactionCard = ({ transaction }) => {
   );
 };
 
-
-
-const ContractTransactionsPage = ({ contractAddressParam = "", contractAbiParam = "" }) => {
+const ContractTransactionsPage = () => {
+  const location = useLocation();
+  const { contractAddressParam, contractAbiParam } = location.state || {};
   const [contractAddress, setContractAddress] = useState(contractAddressParam);
   const [contractAbi, setContractAbi] = useState(contractAbiParam);
   const [transactionDetails, setTransactionDetails] = useState([]);

@@ -4,6 +4,7 @@ import ConstructionIcon from "@mui/icons-material/Construction";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ExploreIcon from "@mui/icons-material/Explore";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
+import SettingsIcon from '@mui/icons-material/Settings';
 import { TextField } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
@@ -12,6 +13,7 @@ import { amber, deepOrange, green, teal } from "@mui/material/colors";
 import HDWalletProvider from "@truffle/hdwallet-provider";
 import CodeEditor from "@uiw/react-textarea-code-editor";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
 import Web3 from "web3";
 import { solidityCompiler } from "../../utils/solidity/index.js";
 import AvalancheIcon from "../assets/avalanche.png";
@@ -55,6 +57,7 @@ const SourceCodeView = ({
     "https://testnet.snowtrace.io/tx/",
     "https://blockexplorer.bloxberg.org/tx/",
   ];
+  const navigate = useNavigate();
 
   // Load the cached value on component mount
   useEffect(() => {
@@ -204,6 +207,15 @@ const SourceCodeView = ({
   const openExplorer = () => {
     const explorerURL = explorers[blockchains.indexOf(selectedChain)];
     window.open(explorerURL + transactionHash, "_blank");
+  };
+
+  const navigateToManagement = () => {
+    const formattedABI = JSON.stringify(compiledCode.abi, null, "\t");
+    const params = {
+      contractAddressParam: deployedAddress,
+      contractAbiParam: formattedABI
+    };
+    navigate('/management', { state: params });
   };
 
   const handleBlockchainChange = (selectedIndex) => {
@@ -366,6 +378,25 @@ const SourceCodeView = ({
               variant="contained"
             >
               Open Explorer
+            </Button>
+          ) : (
+            <div></div>
+          )}
+        </div>
+      ) : (
+        <div></div>
+      )}
+      {compiledCode ? (
+        <div style={{ marginBottom: "15px", marginTop: "15px" }}>
+          {deployedAddress && !deployingContract ? (
+            <Button
+              startIcon={<SettingsIcon />}
+              onClick={navigateToManagement}
+              style={{ marginLeft: "5px" }}
+              sx={{ backgroundColor: "#590696", color: "#fff" }}
+              variant="contained"
+            >
+              Manage Contract
             </Button>
           ) : (
             <div></div>
