@@ -4,7 +4,7 @@ import ConstructionIcon from "@mui/icons-material/Construction";
 import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ExploreIcon from "@mui/icons-material/Explore";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
-import SettingsIcon from '@mui/icons-material/Settings';
+import SettingsIcon from "@mui/icons-material/Settings";
 import { TextField } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
@@ -13,7 +13,7 @@ import { amber, deepOrange, green, teal } from "@mui/material/colors";
 import HDWalletProvider from "@truffle/hdwallet-provider";
 import CodeEditor from "@uiw/react-textarea-code-editor";
 import React, { useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import Web3 from "web3";
 import { solidityCompiler } from "../../utils/solidity/index.js";
 import AvalancheIcon from "../assets/avalanche.png";
@@ -61,15 +61,17 @@ const SourceCodeView = ({
 
   // Load the cached value on component mount
   useEffect(() => {
-    const cachedValue = localStorage.getItem('privateKey');
+    const cachedValue = localStorage.getItem("privateKey");
     if (cachedValue) {
       setPrivateKey(cachedValue);
     }
   }, []);
 
-
   const deployContract = async (newSelectedChain) => {
-    if ((!privateKey || privateKey.length === 0) && newSelectedChain !== "Ethereum") {
+    if (
+      (!privateKey || privateKey.length === 0) &&
+      newSelectedChain !== "Ethereum"
+    ) {
       alert("Please enter your private key from Metamask to deploy!");
       return;
     }
@@ -82,55 +84,63 @@ const SourceCodeView = ({
       }
     }
     if (window.web3) {
-      let rpcURL = "";
-      if (newSelectedChain !== "Ethereum") {
-        rpcURL = blockchainRPCs[blockchains.indexOf(newSelectedChain)];
-      }
-      let provider = window.web3.currentProvider;
-      if (rpcURL && rpcURL.length > 0) {
-        provider = new HDWalletProvider([privateKey], rpcURL);
-      } else {
-        await switchToEthereum();
-      }
-      const web3 = new Web3(provider);
+      try {
+        let rpcURL = "";
+        if (newSelectedChain !== "Ethereum") {
+          rpcURL = blockchainRPCs[blockchains.indexOf(newSelectedChain)];
+        }
+        let provider = window.web3.currentProvider;
+        if (rpcURL && rpcURL.length > 0) {
+          provider = new HDWalletProvider([privateKey], rpcURL);
+        } else {
+          await switchToEthereum();
+        }
+        const web3 = new Web3(provider);
 
-      web3.eth.getAccounts(async function (error, accounts) {
-        if (accounts.length === 0) {
-          alert("Please connect your wallet to use your account!");
-          return;
-        }
-        setUserAddress(accounts);
-        const bytecode = compiledCode.evm?.bytecode?.object;
-        const contract = new web3.eth.Contract(compiledCode.abi);
-        setDeployingContract(true);
-        try {
-          await contract
-            .deploy({
-              data: "0x" + bytecode,
-              arguments: constructorParams ? constructorParams : [],
-            })
-            .send({ from: accounts[0], gas: 3000000 })
-            .on("confirmation", (confirmationNumber, receipt) => {
-              if (confirmationNumber === 1) {
-                console.log(
-                  "Contract deployed at address:",
-                  receipt.contractAddress
-                );
-                console.log("Transaction hash:", receipt.transactionHash);
-                setDeployedAddress(receipt.contractAddress);
-                setTransactionHash(receipt.transactionHash);
-                setDialogText("Contract Deployed!");
-                setOpen(true);
-                setUserAddress([window.ethereum.selectedAddress]);
-                setDeployingContract(false);
-              }
-            });
-        } catch (error) {
-          console.log(error);
-          setDeployingContract(false);
-          alert(`Error deploying contract!\n\n${error['message'].toString()}`);
-        }
-      });
+        web3.eth.getAccounts(async function (error, accounts) {
+          if (accounts.length === 0) {
+            alert("Please connect your wallet to use your account!");
+            return;
+          }
+          setUserAddress(accounts);
+          const bytecode = compiledCode.evm?.bytecode?.object;
+          const contract = new web3.eth.Contract(compiledCode.abi);
+          setDeployingContract(true);
+          try {
+            await contract
+              .deploy({
+                data: "0x" + bytecode,
+                arguments: constructorParams ? constructorParams : [],
+              })
+              .send({ from: accounts[0], gas: 3000000 })
+              .on("confirmation", (confirmationNumber, receipt) => {
+                if (confirmationNumber === 1) {
+                  console.log(
+                    "Contract deployed at address:",
+                    receipt.contractAddress
+                  );
+                  console.log("Transaction hash:", receipt.transactionHash);
+                  setDeployedAddress(receipt.contractAddress);
+                  setTransactionHash(receipt.transactionHash);
+                  setDialogText("Contract Deployed!");
+                  setOpen(true);
+                  setUserAddress([window.ethereum.selectedAddress]);
+                  setDeployingContract(false);
+                }
+              });
+          } catch (error) {
+            console.log(error);
+            setDeployingContract(false);
+            alert(
+              `Error deploying contract!\n\n${error["message"].toString()}`
+            );
+          }
+        });
+      } catch (error) {
+        console.log(error);
+        setDeployingContract(false);
+        alert(`Error deploying contract!\n\n${error["message"].toString()}`);
+      }
     } else {
       console.log(
         "Non-Ethereum browser detected. You should consider trying MetaMask!"
@@ -170,8 +180,8 @@ const SourceCodeView = ({
   const privateKeyChange = (event) => {
     const input = event.target.value;
     setPrivateKey(input);
-    localStorage.setItem('privateKey', input);
-  }
+    localStorage.setItem("privateKey", input);
+  };
 
   const compileCode = async () => {
     const contractStart = completeContract.indexOf(`contract ${contractName}`);
@@ -214,9 +224,9 @@ const SourceCodeView = ({
     const formattedABI = JSON.stringify(compiledCode.abi, null, "\t");
     const params = {
       contractAddressParam: deployedAddress,
-      contractAbiParam: formattedABI
+      contractAbiParam: formattedABI,
     };
-    navigate('/management', { state: params });
+    navigate("/management", { state: params });
   };
 
   const handleBlockchainChange = (selectedIndex) => {
