@@ -135,6 +135,7 @@ const SourceCodeView = ({
       console.log(
         "Non-Ethereum browser detected. You should consider trying MetaMask!"
       );
+      alert("Please install Metamask to deploy!");
     }
   };
 
