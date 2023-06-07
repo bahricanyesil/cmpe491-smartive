@@ -165,7 +165,7 @@ const ContractTransactionsPage = () => {
           const tempTransaction = {
             hash: tx.hash,
             from: tx.from,
-            to: tx.to,
+            to: tx.to || "Ownership Transfer",
             value: web3.utils.fromWei(tx.value, 'ether'),
             gasPrice: web3.utils.fromWei(tx.gasPrice, 'gwei'),
             gas: tx.gas,
