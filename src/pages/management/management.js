@@ -132,7 +132,7 @@ const ContractTransactionsPage = () => {
       const contract = new web3.eth.Contract(JSON.parse(contractAbi), contractAddress);
       const blockNumber = await web3.eth.getBlockNumber();
       const filter = {
-        fromBlock: blockNumber - 20000,
+        fromBlock: blockNumber > 20000 ? blockNumber - 20000 : 0,
         toBlock: 'latest',
         address: contractAddress,
       };
