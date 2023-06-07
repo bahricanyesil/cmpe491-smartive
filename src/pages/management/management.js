@@ -188,8 +188,20 @@ const ContractTransactionsPage = () => {
       
         return timeB - timeA;
       });
-      setTransactionDetails([...tempTransactionDetails]);
+
+      const uniqueTransactionHashes = new Set();
+
+      const filteredTransactions = tempTransactionDetails.filter((transaction) => {
+        if (uniqueTransactionHashes.has(transaction.hash)) {
+          return false;
+        }
+        uniqueTransactionHashes.add(transaction.hash);
+        return true;
+      });
+
+      setTransactionDetails(filteredTransactions);
       console.log(transactionDetails);
+      setDialogText("Successfully Fetched!")
     } catch (error) {
       setDialogText("Error occurred!")
       console.error(error);
