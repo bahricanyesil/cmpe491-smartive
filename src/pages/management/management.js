@@ -132,7 +132,7 @@ const ContractTransactionsPage = () => {
       const contract = new web3.eth.Contract(JSON.parse(contractAbi), contractAddress);
       const blockNumber = await web3.eth.getBlockNumber();
       const filter = {
-        fromBlock: blockNumber - 20000,
+        fromBlock: blockNumber > 20000 ? blockNumber - 20000 : 0,
         toBlock: 'latest',
         address: contractAddress,
       };
@@ -165,7 +165,7 @@ const ContractTransactionsPage = () => {
           const tempTransaction = {
             hash: tx.hash,
             from: tx.from,
-            to: tx.to,
+            to: tx.to || "Ownership Transfer",
             value: web3.utils.fromWei(tx.value, 'ether'),
             gasPrice: web3.utils.fromWei(tx.gasPrice, 'gwei'),
             gas: tx.gas,
@@ -188,8 +188,20 @@ const ContractTransactionsPage = () => {
       
         return timeB - timeA;
       });
-      setTransactionDetails([...tempTransactionDetails]);
+
+      const uniqueTransactionHashes = new Set();
+
+      const filteredTransactions = tempTransactionDetails.filter((transaction) => {
+        if (uniqueTransactionHashes.has(transaction.hash)) {
+          return false;
+        }
+        uniqueTransactionHashes.add(transaction.hash);
+        return true;
+      });
+
+      setTransactionDetails(filteredTransactions);
       console.log(transactionDetails);
+      setDialogText("Successfully Fetched!")
     } catch (error) {
       setDialogText("Error occurred!")
       console.error(error);
