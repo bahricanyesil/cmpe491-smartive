@@ -5,12 +5,10 @@ import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import ExploreIcon from "@mui/icons-material/Explore";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
 import SettingsIcon from "@mui/icons-material/Settings";
-import { TextField } from "@mui/material";
 import MuiAlert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
 import { amber, deepOrange, green, teal } from "@mui/material/colors";
-import HDWalletProvider from "@truffle/hdwallet-provider";
 import CodeEditor from "@uiw/react-textarea-code-editor";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -91,7 +89,7 @@ const SourceCodeView = ({
         }
         let provider = window.web3.currentProvider;
         if (rpcURL && rpcURL.length > 0) {
-          provider = new HDWalletProvider([privateKey], rpcURL);
+          // provider = new HDWalletProvider([privateKey], rpcURL);
         } else {
           await switchToEthereum();
         }
@@ -310,7 +308,7 @@ const SourceCodeView = ({
           )}
         </div>
       </div>
-      <div
+      {/* <div
         style={{
           display: "flex",
           justifyContent: "space-between",
@@ -326,7 +324,7 @@ const SourceCodeView = ({
             value={maskedPrivateKey}
           />
         </div>
-      </div>
+      </div> */}
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         open={open}
